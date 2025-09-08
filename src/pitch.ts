@@ -1,3 +1,4 @@
+import { LETTER_COORDS } from "./constants";
 import { Interval } from "./interval";
 import { TonalContext } from "./tonality";
 
@@ -11,15 +12,6 @@ export class Pitch {
     }
 
     static fromSPN(spn: string): Pitch {
-        const letters = [
-            { w: 0, h: 0 },
-            { w: 1, h: 0 },
-            { w: 2, h: 0 },
-            { w: 2, h: 1 },
-            { w: 3, h: 1 },
-            { w: 4, h: 1 },
-            { w: 5, h: 1 },
-        ];
         const regex = /^([A-Ga-g])([#bxw]+)?(-?\d+)$/;
         const match = spn.match(regex);
         if (!match) {
@@ -29,7 +21,7 @@ export class Pitch {
         const [, letter, accidentalStr = "", octaveStr] = match;
         const octave = parseInt(octaveStr, 10) + 1;
 
-        let { w, h } = letters["CDEFGAB".indexOf(letter)];
+        let { w, h } = LETTER_COORDS["CDEFGAB".indexOf(letter)];
 
         let accidental = 0;
         const accidentalArray = accidentalStr.split("");

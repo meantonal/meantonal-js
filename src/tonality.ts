@@ -1,4 +1,5 @@
 import { Chroma } from "./chroma";
+import { LETTER_COORDS, MODES } from "./constants";
 import { Pitch } from "./pitch";
 
 export class TonalContext {
@@ -20,29 +21,6 @@ export class TonalContext {
         this.chromaOffset = mode - chroma;
     }
 
-    private static MODES: Record<string, number> = {
-        LYDIAN: 0,
-        IONIAN: 1,
-        MIXOLYDIAN: 2,
-        DORIAN: 3,
-        AEOLIAN: 4,
-        PHRYGIAN: 5,
-        LOCRIAN: 6,
-
-        MAJOR: 1,
-        MINOR: 4,
-    };
-
-    private static LETTER_COORDS = [
-        { w: 0, h: 0 }, // C
-        { w: 1, h: 0 }, // D
-        { w: 2, h: 0 }, // E
-        { w: 2, h: 1 }, // F
-        { w: 3, h: 1 }, // G
-        { w: 4, h: 1 }, // A
-        { w: 5, h: 1 }, // B
-    ];
-
     private static ACCIDENTAL_MAP: Record<string, number> = {
         "#": 1,
         x: 2,
@@ -57,14 +35,13 @@ export class TonalContext {
             throw new Error(`Invalid tonic string: ${tonic}`);
         }
 
-        const modeNumber = TonalContext.MODES[mode.toUpperCase()];
+        const modeNumber = MODES[mode.toUpperCase()];
         if (modeNumber === undefined) {
             throw new Error(`Invalid mode string: ${mode}`);
         }
 
         const [, letter, accidentalStr = ""] = match;
-        let { w, h } =
-            TonalContext.LETTER_COORDS["CDEFGAB".indexOf(letter.toUpperCase())];
+        let { w, h } = LETTER_COORDS["CDEFGAB".indexOf(letter.toUpperCase())];
 
         for (const char of accidentalStr) {
             w += TonalContext.ACCIDENTAL_MAP[char] ?? 0;

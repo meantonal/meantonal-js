@@ -1,3 +1,5 @@
+import { Interval } from "./interval";
+
 export class Pitch {
     w: number;
     h: number;
@@ -63,16 +65,16 @@ export class Pitch {
         return this.w * 2 - this.h * 5;
     }
 
-    public get pitchClass7(): number {
+    public get pc7(): number {
         return (((this.w + this.h) % 7) + 7) % 7;
     }
 
-    public get pitchClass12(): number {
+    public get pc12(): number {
         return ((this.midi % 12) + 12) % 12;
     }
 
     public get letter(): string {
-        return "CDEFGAB".charAt(this.pitchClass7);
+        return "CDEFGAB".charAt(this.pc7);
     }
 
     public get accidental(): number {

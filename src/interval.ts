@@ -7,6 +7,59 @@ export class Interval {
         this.w = w;
         this.h = h;
     }
+    static fromName(name: string) {
+        const majorInts = [
+            { w: 0, h: 0 },
+            { w: 1, h: 0 },
+            { w: 2, h: 0 },
+            { w: 2, h: 1 },
+            { w: 3, h: 1 },
+            { w: 4, h: 1 },
+            { w: 5, h: 1 },
+        ];
+        const sign = name[0] === "-" ? -1 : 1;
+
+        const regex = /^-?([PpMmAaDd#b]+)?(\d+)$/;
+        const match = name.match(regex);
+        if (!match) {
+            throw new Error(`Invalid interval name: ${name}`);
+        }
+
+        const [, accidentalStr = "", sizeStr] = match;
+
+        const genericSize = parseInt(sizeStr, 10);
+
+        const simple = (genericSize - 1) % 7;
+        let { w, h } = majorInts[simple];
+
+        const octave = Math.floor((genericSize - 1) / 7);
+        w += 5 * octave;
+        h += 2 * octave;
+
+        let qualityAdjustment = 0;
+        accidentalStr.split("").forEach((x) => {
+            switch (x) {
+                case "A":
+                case "a":
+                case "#":
+                    qualityAdjustment++;
+                    break;
+                case "m":
+                case "b":
+                    qualityAdjustment--;
+                    break;
+                case "D":
+                case "d":
+                    if (qualityAdjustment === 0) qualityAdjustment -= 2;
+                    else qualityAdjustment--;
+                    break;
+            }
+        });
+        w += qualityAdjustment;
+        h -= qualityAdjustment;
+
+        return new Interval(sign * w, sign * h);
+    }
 
     static fromSPN(ps: string, qs: string) {
         return Interval.between(Pitch.fromSPN(ps), Pitch.fromSPN(qs));

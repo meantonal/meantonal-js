@@ -107,6 +107,9 @@ export class Axis {
     h: number;
     constructor(p: Pitch, q: Pitch) {
         this.w = p.w + q.w;
-        this.h = p.w + q.w;
+        this.h = p.h + q.h;
+    }
+    static fromSPN(ps: string, qs: string) {
+        return new Axis(Pitch.fromSPN(ps), Pitch.fromSPN(qs));
     }
 }

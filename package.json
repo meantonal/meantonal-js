@@ -1,0 +1,49 @@
+{
+  "name": "meantonal",
+  "version": "1.0.0",
+  "description": "An elegant library for representing pitch in Western music.",
+  "keywords": [
+    "music",
+    "scale",
+    "midi",
+    "music-theory",
+    "music-notation",
+    "music-library",
+    "interval",
+    "chord",
+    "transpose",
+    "tonality",
+    "key",
+    "mode",
+    "analysis",
+    "composition",
+    "music-generation"
+  ],
+  "homepage": "https://github.com/meantonal/meantonal-js#readme",
+  "bugs": {
+    "url": "https://github.com/meantonal/meantonal-js/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/meantonal/meantonal-js.git"
+  },
+  "license": "MIT",
+  "author": "Hex",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "esbuild src/index.ts --bundle --format=esm --platform=neutral --target=es2020 --outfile=dist/index.js && tsc --emitDeclarationOnly",
+    "test": "jest"
+  },
+  "files": [
+    "dist"
+  ],
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "esbuild": "^0.25.9",
+    "jest": "^30.1.3",
+    "ts-jest": "^29.4.1",
+    "typescript": "^5.9.2"
+  }
+}

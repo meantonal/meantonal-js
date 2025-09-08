@@ -121,6 +121,9 @@ test("Pitch.enharmonic produces correct result", () => {
     p = Pitch.fromSPN("Ex4");
     q = Pitch.fromSPN("Gbb5");
     expect(p.enharmonic(q, 31)).toBeTruthy();
+    p = Pitch.fromSPN("Ex4");
+    q = Pitch.fromSPN("Gbb5");
+    expect(p.enharmonic(q)).toBeFalsy();
 });
 
 test("Pitch.transposeReal produces correct result", () => {

@@ -50,8 +50,8 @@ export class Interval {
                     break;
                 case "D":
                 case "d":
-                    if (qualityAdjustment === 0) qualityAdjustment -= 2;
-                    else qualityAdjustment--;
+                    if (simple === 0 || simple === 3 || simple === 4) qualityAdjustment--;
+                    else qualityAdjustment -= 2;
                     break;
             }
         });
@@ -74,17 +74,21 @@ export class Interval {
     }
 
     public get quality() {
-        if (this.chroma === 0) return 0;
+        if (Math.abs(this.chroma) <= 1) return 0;
         if (this.chroma > 0 && this.chroma <= 5)
             return Math.floor((this.chroma + 5) / 7);
         if (this.chroma < 0 && this.chroma >= -5)
-            return Math.floor((this.chroma - 5) / 7);
+            return Math.ceil((this.chroma - 5) / 7);
         if (this.chroma > 5) return Math.floor((this.chroma + 8) / 7);
-        return Math.floor((this.chroma - 8) / 7);
+        return Math.ceil((this.chroma - 8) / 7);
     }
 
     public get stepspan(): number {
-        return (((this.w + this.h) % 7) + 7) % 7;
+        return this.w + this.h;
+    }
+
+    public get pc7(): number {
+        return ((this.stepspan % 7) + 7) % 7;
     }
 
     public get pc12(): number {
@@ -99,7 +103,7 @@ export class Interval {
         return ((this.chroma % edo) + edo) % edo === ((m.chroma % edo) + edo) % edo;
     }
 
-    public negate() {
+    public get negative() {
         return new Interval(-this.w, -this.h);
     }
 
@@ -111,8 +115,8 @@ export class Interval {
         return new Interval(this.w - m.w, this.h - m.h);
     }
 
-    public simple() {
-        const octave = Math.floor(this.w + this.h);
+    public get simple() {
+        const octave = Math.trunc((this.w + this.h) / 7);
         return new Interval(this.w - octave * 5, this.h - octave * 2);
     }
 }

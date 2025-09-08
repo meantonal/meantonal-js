@@ -3,10 +3,12 @@ import { Pitch } from "./pitch";
 export class Interval {
     w: number;
     h: number;
+
     constructor(w: number, h: number) {
         this.w = w;
         this.h = h;
     }
+
     static fromName(name: string) {
         const majorInts = [
             { w: 0, h: 0 },

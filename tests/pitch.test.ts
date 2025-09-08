@@ -103,42 +103,42 @@ test("Pitch.octave produces correct result", () => {
 test("Pitch.equal produces correct result", () => {
     let p = Pitch.fromSPN("C#4");
     let q = Pitch.fromSPN("C#5");
-    expect(p.equal(q)).toBeFalsy();
+    expect(p.isEqual(q)).toBeFalsy();
     q = Pitch.fromSPN("Db3");
-    expect(p.equal(q)).toBeFalsy();
+    expect(p.isEqual(q)).toBeFalsy();
     q = Pitch.fromSPN("C#4");
-    expect(p.equal(q)).toBeTruthy();
+    expect(p.isEqual(q)).toBeTruthy();
 });
 
 test("Pitch.enharmonic produces correct result", () => {
     let p = Pitch.fromSPN("C#4");
     let q = Pitch.fromSPN("C#5");
-    expect(p.enharmonic(q)).toBeTruthy();
+    expect(p.isEnharmonic(q)).toBeTruthy();
     q = Pitch.fromSPN("Db5");
-    expect(p.enharmonic(q)).toBeTruthy();
+    expect(p.isEnharmonic(q)).toBeTruthy();
     q = Pitch.fromSPN("Db5");
-    expect(p.enharmonic(q, 31)).toBeFalsy();
+    expect(p.isEnharmonic(q, 31)).toBeFalsy();
     p = Pitch.fromSPN("Ex4");
     q = Pitch.fromSPN("Gbb5");
-    expect(p.enharmonic(q, 31)).toBeTruthy();
+    expect(p.isEnharmonic(q, 31)).toBeTruthy();
     p = Pitch.fromSPN("Ex4");
     q = Pitch.fromSPN("Gbb5");
-    expect(p.enharmonic(q)).toBeFalsy();
+    expect(p.isEnharmonic(q)).toBeFalsy();
 });
 
 test("Pitch.transposeReal produces correct result", () => {
     let p = Pitch.fromSPN("C4");
     let q = Pitch.fromSPN("F#4");
     let m = Interval.fromName("A4");
-    expect(p.transposeReal(m).equal(q)).toBeTruthy();
+    expect(p.transposeReal(m).isEqual(q)).toBeTruthy();
 });
 
 test("Pitch.invert produces correct result", () => {
     let p = Pitch.fromSPN("E4");
     let q = Pitch.fromSPN("Eb4");
     const axis = Axis.fromSPN("C4", "G4");
-    expect(p.invert(axis).equal(q)).toBeTruthy();
+    expect(p.invert(axis).isEqual(q)).toBeTruthy();
     p = Pitch.fromSPN("D4");
     q = Pitch.fromSPN("F4");
-    expect(p.invert(axis).equal(q)).toBeTruthy();
+    expect(p.invert(axis).isEqual(q)).toBeTruthy();
 });

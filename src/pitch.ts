@@ -1,12 +1,15 @@
 import { Interval } from "./interval";
+import { TonalContext } from "./tonality";
 
 export class Pitch {
     w: number;
     h: number;
+
     constructor(w: number, h: number) {
         this.w = w;
         this.h = h;
     }
+
     static fromSPN(spn: string): Pitch {
         const letters = [
             { w: 0, h: 0 },
@@ -85,11 +88,11 @@ export class Pitch {
         return Math.floor((this.w + this.h) / 7 - 1);
     }
 
-    public equal(p: Pitch) {
+    public isEqual(p: Pitch) {
         return this.w === p.w && this.h === p.h;
     }
 
-    public enharmonic(p: Pitch, edo = 12) {
+    public isEnharmonic(p: Pitch, edo = 12) {
         return ((this.chroma % edo) + edo) % edo === ((p.chroma % edo) + edo) % edo;
     }
 
@@ -100,15 +103,33 @@ export class Pitch {
     public invert(axis: Axis) {
         return new Pitch(axis.w - this.w, axis.h - this.h);
     }
+
+    public degreeIn(context: TonalContext) {
+        return context.degreeNumber(this);
+    }
+
+    public alterationIn(context: TonalContext) {
+        return context.degreeAlteration(this);
+    }
+
+    public snapTo(context: TonalContext) {
+        return context.snapDiatonic(this);
+    }
+
+    public transposeDiatonic(steps: number, context: TonalContext) {
+        return this.transposeReal(new Interval(steps, 0)).snapTo(context);
+    }
 }
 
 export class Axis {
     w: number;
     h: number;
+
     constructor(p: Pitch, q: Pitch) {
         this.w = p.w + q.w;
         this.h = p.h + q.h;
     }
+
     static fromSPN(ps: string, qs: string) {
         return new Axis(Pitch.fromSPN(ps), Pitch.fromSPN(qs));
     }

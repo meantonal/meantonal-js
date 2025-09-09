@@ -2,6 +2,16 @@ import { Chroma } from "./chroma";
 import { LETTER_COORDS, MODES } from "./constants";
 import { Pitch } from "./pitch";
 
+/**
+ * The TonalContext class stores information about the currently governing
+ * key or mode.
+ * - It is used with various methods to query or transform the position of
+ *   Pitch vectors within a key or mode.
+ * - Created from the "chroma" of the tonic scale degree (it's signed distance
+ *   from C in perfect fifths), and the mode, numbered in ascending 5ths from
+ *   Lydian = 0.
+ * - Can also be created from strings with TonalContext.fromStrings()
+ */
 export class TonalContext {
     tonic: {
         letter: string;
@@ -28,6 +38,11 @@ export class TonalContext {
         w: -2,
     };
 
+    /**
+     * Create a TonalContext using two strings for the tonic note name
+     * and the mode.
+     * - e.g. TonalContext.fromStrings("C#", "Dorian")
+     */
     static fromStrings(tonic: string, mode: string) {
         const regex = /^([A-Ga-g])([#bxw]+)?$/;
         const match = tonic.match(regex);
@@ -52,10 +67,21 @@ export class TonalContext {
         return new TonalContext(chroma, modeNumber);
     }
 
+    /**
+     * Returns the scale degree (0-indexed) of the passed in Pitch vector in
+     * the current context.
+     */
     public degreeNumber(p: Pitch): number {
         return (((p.w + p.h - "CDEFGAB".indexOf(this.tonic.letter)) % 7) + 7) % 7;
     }
 
+    /**
+     * Returns the scale degree alteration represented by a Pitch in the
+     * current TonalContext, e.g. C# is a raised note in the key of C major.
+     * 0 represents a diatonic Pitch.
+     * +1 / -1 represent a Pitch raised/lowered with accidentals.
+     * +2 / -2 represent Pitches too remote to belong in a given TonalContext.
+     */
     public degreeAlteration(p: Pitch): number {
         let x = p.chroma + this.chromaOffset;
         if (0 <= x && x < 7) return 0;
@@ -65,10 +91,20 @@ export class TonalContext {
         return 2;
     }
 
+    /**
+     * Returns the chroma (signed distance in perfect 5ths from C) of the
+     * diatonic variant of the passed in scale degree (0-indexed so the tonic
+     * is 0).
+     */
     public degreeChroma(degree: number): number {
         return ((degree * 2 + this.mode) % 7) - this.chromaOffset;
     }
 
+    /**
+     * Snaps a Pitch vector to the diatonic position for that letter-name in
+     * the current TonalContext.
+     * - e.g. in D major, F4 would "snap" to F#4.
+     */
     public snapDiatonic(p: Pitch): Pitch {
         let result = new Pitch(p.w, p.h);
         while (result.alterationIn(this) > 0) {

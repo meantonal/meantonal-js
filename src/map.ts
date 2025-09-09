@@ -1,6 +1,10 @@
 import { Interval } from "./interval";
 import { Pitch } from "./pitch";
 
+/**
+ * An indeterminate vector type to be used with the Map1d and Map2d classes.
+ * Can be converted to Pitch or Interval vectors as needed using its methods.
+ */
 export class MapVec {
     w: number;
     h: number;
@@ -9,15 +13,27 @@ export class MapVec {
         this.h = h;
     }
 
+    /**
+     * Converts a MapVec into a Pitch vector.
+     * Returns a new vector. Does not modify the MapVec.
+     */
     public toPitch() {
         return new Pitch(this.w, this.h);
     }
 
+    /**
+     * Converts a MapVec into an Interval vector.
+     * Returns a new vector. Does not modify the MapVec.
+     */
     public toInterval() {
         return new Interval(this.w, this.h);
     }
 }
 
+/**
+ * Represents a 1x2 matrix. Used to effect an arbitrary linear map from
+ * 2d vectors down to 1d numbers.
+ */
 export class Map1d {
     private m0: number;
     private m1: number;
@@ -27,11 +43,19 @@ export class Map1d {
         this.m1 = m1;
     }
 
+    /**
+     * Multiplies the matrix with the passed in vector.
+     * Returns a number.
+     */
     public map(v: MapVec | Pitch | Interval): number {
         return this.m0 * v.w + this.m1 * v.h;
     }
 }
 
+/**
+ * Represents a 2x2 matrix. Used to effect an arbitrary basis change from one
+ * coordinates system to another.
+ */
 export class Map2d {
     private m00: number;
     private m01: number;
@@ -45,6 +69,10 @@ export class Map2d {
         this.m11 = m11;
     }
 
+    /**
+     * Multiplies the matrix with the passed in vector.
+     * Returns a MapVec.
+     */
     public map(v: MapVec | Pitch | Interval): MapVec {
         return new MapVec(
             this.m00 * v.w + this.m01 * v.h,

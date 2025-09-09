@@ -19,7 +19,7 @@
     "composition",
     "music-generation"
   ],
-  "homepage": "https://github.com/meantonal/meantonal-js#readme",
+  "homepage": "https://meantonal.org",
   "bugs": {
     "url": "https://github.com/meantonal/meantonal-js/issues"
   },

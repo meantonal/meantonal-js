@@ -1,5 +1,8 @@
 import { Map1d, Map2d } from "./map";
 
+/**
+ * Used to map modes to numbers in certain methods.
+ */
 export const MODES: Record<string, number> = {
     LYDIAN: 0,
     IONIAN: 1,
@@ -13,6 +16,9 @@ export const MODES: Record<string, number> = {
     MINOR: 4,
 };
 
+/**
+ * Used in the construction of Pitch and Interval vectors by certain mehtods.
+ */
 export const LETTER_COORDS = [
     { w: 0, h: 0 }, // C
     { w: 1, h: 0 }, // D

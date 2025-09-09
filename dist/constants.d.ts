@@ -1,5 +1,11 @@
 import { Map1d, Map2d } from "./map";
+/**
+ * Used to map modes to numbers in certain methods.
+ */
 export declare const MODES: Record<string, number>;
+/**
+ * Used in the construction of Pitch and Interval vectors by certain mehtods.
+ */
 export declare const LETTER_COORDS: {
     w: number;
     h: number;

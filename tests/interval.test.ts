@@ -156,48 +156,48 @@ test("Interval.pc12 produces correct result", () => {
     expect(m.pc12).toEqual(0);
 });
 
-test("Interval.equal produces correct result", () => {
+test("Interval.isEqual produces correct result", () => {
     let m = new Interval(2, 0);
     let n = new Interval(1, 1);
-    expect(m.equal(n)).toBeFalsy();
+    expect(m.isEqual(n)).toBeFalsy();
     n = new Interval(2, 0);
-    expect(m.equal(n)).toBeTruthy();
+    expect(m.isEqual(n)).toBeTruthy();
 });
 
-test("Interval.enharmonic produces correct result", () => {
+test("Interval.isEnharmonic produces correct result", () => {
     let m = Interval.fromName("m7");
     let n = Interval.fromName("A6");
-    expect(m.enharmonic(n)).toBeTruthy();
-    expect(m.enharmonic(n, 31)).toBeFalsy();
+    expect(m.isEnharmonic(n)).toBeTruthy();
+    expect(m.isEnharmonic(n, 31)).toBeFalsy();
     m = Interval.fromName("P8");
     n = Interval.fromName("AAAA6");
-    expect(m.enharmonic(n, 31)).toBeTruthy();
-    expect(m.enharmonic(n)).toBeFalsy();
+    expect(m.isEnharmonic(n, 31)).toBeTruthy();
+    expect(m.isEnharmonic(n)).toBeFalsy();
 });
 
 test("Interval.negate produces correct result", () => {
     let m = new Interval(3, 4);
     let n = new Interval(-3, -4);
-    expect(m.negative.equal(n)).toBeTruthy();
+    expect(m.negative.isEqual(n)).toBeTruthy();
 });
 
 test("Interval.add produces correct result", () => {
     let m = Interval.fromName("M3");
     let n = Interval.fromName("m3");
     let sum = Interval.fromName("P5");
-    expect(m.add(n).equal(sum)).toBeTruthy();
+    expect(m.add(n).isEqual(sum)).toBeTruthy();
 });
 
 test("Interval.subtract produces correct result", () => {
     let m = Interval.fromName("P5");
     let n = Interval.fromName("m3");
     let difference = Interval.fromName("M3");
-    expect(m.subtract(n).equal(difference)).toBeTruthy();
+    expect(m.subtract(n).isEqual(difference)).toBeTruthy();
 });
 
 test("Interval.simple produces correct result", () => {
     let m = Interval.fromName("M17");
     let n = Interval.fromName("M3");
-    expect(m.simple.equal(n)).toBeTruthy();
-    expect(m.negative.simple.equal(n.negative)).toBeTruthy();
+    expect(m.simple.isEqual(n)).toBeTruthy();
+    expect(m.negative.simple.isEqual(n.negative)).toBeTruthy();
 });

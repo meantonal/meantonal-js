@@ -16,10 +16,34 @@ Meantonal is:
 - **Just vectors**: under the hood [pitches](https://meantonal.org/learn/pitch/) and [intervals](https://meantonal.org/learn/intervals/) are 2d vectors. Operations are simple to understand, surprisingly powerful, and fast to execute.
 - **Tuning-agnostic**: Target any meantone tuning system, not just 12-tone equal temperament. You want 31 tones per octave? Done.
 
+For the C implementation of Meantonal [click here](https://github.com/meantonal/meantonal-c).
+
 # Installation
 
 Adding Meantonal to your project is as simple as running:
 
 ```bash
 npm install meantonal
+```
+
+You're now ready to import and use Meantonal's classes.
+
+```ts
+import { Pitch, Interval, TonalContext, Axis } from "meantonal";
+
+let p = Pitch.fromSPN("C4");
+let q = Pitch.fromSPN("E4");
+
+let m = p.intervalTo(q);
+let n = Interval.fromName("M3");
+
+m.isEqual(n); // true
+
+let context = TonalContext.fromStrings("Eb", "major");
+
+q = q.snapDiatonic(context); // q has now snapped to Eb4
+
+let axis = Axis.fromSPN("D4", "A4");
+
+q = q.invert(axis); // q is now G#4
 ```

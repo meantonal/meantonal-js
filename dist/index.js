@@ -92,10 +92,22 @@ var Pitch = class _Pitch {
     return Math.floor((this.chroma + 1) / 7);
   }
   /**
-   * The octave number of a note (in SPN numbering).
+   * The octave number of a Pitch (in SPN numbering).
    */
   get octave() {
     return Math.floor((this.w + this.h) / 7 - 1);
+  }
+  /**
+   * The SPN name of a Pitch.
+   */
+  get SPN() {
+    let result = this.letter;
+    let accidental = this.accidental;
+    if (this.accidental == 2) result += "x";
+    else if (this.accidental > 0) result += "#".repeat(accidental);
+    if (this.accidental < 0) result += "b".repeat(-accidental);
+    result += this.octave.toString();
+    return result;
   }
   /**
    * Returns true if two Pitch vectors are identical.
@@ -215,24 +227,15 @@ var Interval = class _Interval {
     w += 5 * octave;
     h += 2 * octave;
     let qualityAdjustment = 0;
-    accidentalStr.split("").forEach((x) => {
-      switch (x) {
-        case "A":
-        case "a":
-        case "#":
-          qualityAdjustment++;
-          break;
-        case "m":
-        case "b":
-          qualityAdjustment--;
-          break;
-        case "D":
-        case "d":
-          if (simple === 0 || simple === 3 || simple === 4) qualityAdjustment--;
-          else qualityAdjustment -= 2;
-          break;
-      }
-    });
+    let splitStr = accidentalStr.split("");
+    qualityAdjustment += splitStr.filter(
+      (x) => x === "A" || x === "a" || x === "#"
+    ).length;
+    qualityAdjustment -= splitStr.filter((x) => x === "m" || x === "b").length;
+    const dims = splitStr.filter((x) => x === "D" || x === "d").length;
+    qualityAdjustment -= dims;
+    if (dims !== 0 && simple !== 0 && simple !== 3 && simple !== 4)
+      qualityAdjustment--;
     w += qualityAdjustment;
     h -= qualityAdjustment;
     return new _Interval(sign * w, sign * h);
@@ -271,7 +274,7 @@ var Interval = class _Interval {
     if (this.chroma < 0 && this.chroma >= -5)
       return Math.ceil((this.chroma - 5) / 7);
     if (this.chroma > 5) return Math.floor((this.chroma + 8) / 7);
-    return Math.ceil((this.chroma - 8) / 7);
+    return Math.floor((this.chroma - 2) / 7);
   }
   /**
    * The "stepspan" of an Interval: the number of diatonic steps it contains,
@@ -292,6 +295,20 @@ var Interval = class _Interval {
    */
   get pc12() {
     return ((this.w * 2 + this.h) % 12 + 12) % 12;
+  }
+  /**
+   * The standard name for an interval.
+   */
+  get name() {
+    let result = "";
+    const quality = this.quality;
+    if (quality > 1) result += "A".repeat(quality - 1);
+    if (quality === 1) result += "M";
+    if (quality === 0) result += "P";
+    if (quality === -1) result += "m";
+    if (quality < -1) result += "d".repeat(-quality - 1);
+    result += (this.stepspan + 1).toString();
+    return result;
   }
   /**
    * Returns true if two Interval vectors are identical.
@@ -363,7 +380,7 @@ var MapVec = class {
     return new Interval(this.x, this.y);
   }
 };
-var Map1d = class {
+var Map1D = class {
   constructor(m0, m1) {
     this.m0 = m0;
     this.m1 = m1;
@@ -377,7 +394,7 @@ var Map1d = class {
     return this.m0 * v.w + this.m1 * v.h;
   }
 };
-var Map2d = class {
+var Map2D = class {
   constructor(m00, m01, m10, m11) {
     this.m00 = m00;
     this.m01 = m01;
@@ -398,6 +415,36 @@ var Map2d = class {
       this.m00 * v.w + this.m01 * v.h,
       this.m10 * v.w + this.m11 * v.h
     );
+  }
+};
+var TuningMap = class _TuningMap {
+  constructor(fifth, referencePitch = "C4", referenceFreq = 261.6255653) {
+    this.referencePitch = Pitch.fromSPN(referencePitch);
+    this.referenceFreq = referenceFreq;
+    this.centMap = new Map1D(fifth, 1200);
+  }
+  /**
+   * Initialises an EDO tuning map by specifying the number of parts to
+   * divide the octave into rather than the width of the fifth in cents.
+   */
+  static fromEDO(edo, referencePitch = "C4", referenceFreq = 261.6255653) {
+    const fifthSteps = Math.round(Math.log2(1.5) * edo);
+    const fifth = fifthSteps * 1200 / edo;
+    return new _TuningMap(fifth, referencePitch, referenceFreq);
+  }
+  /**
+   * Renders the frequency of a Pitch vector in Hertz.
+   */
+  toHz(p) {
+    return this.referenceFreq * 2 ** (this.centMap.map(
+      GENERATORS_TO.map(this.referencePitch.intervalTo(p))
+    ) / 1200);
+  }
+  /**
+   * Renders the width of an Interval in cents.
+   */
+  toCents(m) {
+    return this.centMap.map(GENERATORS_TO.map(m));
   }
 };
 
@@ -429,16 +476,20 @@ var LETTER_COORDS = [
   { w: 5, h: 1 }
   // B
 ];
-var ET7 = new Map1d(1, 1);
-var ET12 = new Map1d(2, 1);
-var ET19 = new Map1d(3, 2);
-var ET31 = new Map1d(5, 3);
-var ET50 = new Map1d(8, 5);
-var ET55 = new Map1d(9, 5);
-var WICKI_TO = new Map2d(1, -3, 0, 1);
-var WICKI_FROM = new Map2d(1, 3, 0, 1);
-var GENERATORS_TO = new Map2d(2, -5, -1, 3);
-var GENERATORS_FROM = new Map2d(3, 5, 1, 2);
+var EDO7 = new Map1D(1, 1);
+var EDO12 = new Map1D(2, 1);
+var EDO17 = new Map1D(3, 1);
+var EDO19 = new Map1D(3, 2);
+var EDO22 = new Map1D(4, 1);
+var EDO31 = new Map1D(5, 3);
+var EDO50 = new Map1D(8, 5);
+var EDO53 = new Map1D(9, 4);
+var EDO55 = new Map1D(9, 5);
+var EDO81 = new Map1D(13, 8);
+var WICKI_TO = new Map2D(1, -3, 0, 1);
+var WICKI_FROM = new Map2D(1, 3, 0, 1);
+var GENERATORS_TO = new Map2D(2, -5, -1, 3);
+var GENERATORS_FROM = new Map2D(3, 5, 1, 2);
 
 // src/chroma.ts
 var Chroma = class {
@@ -555,22 +606,27 @@ var TonalContext = _TonalContext;
 export {
   Axis,
   Chroma,
-  ET12,
-  ET19,
-  ET31,
-  ET50,
-  ET55,
-  ET7,
+  EDO12,
+  EDO17,
+  EDO19,
+  EDO22,
+  EDO31,
+  EDO50,
+  EDO53,
+  EDO55,
+  EDO7,
+  EDO81,
   GENERATORS_FROM,
   GENERATORS_TO,
   Interval,
   LETTER_COORDS,
   MODES,
-  Map1d,
-  Map2d,
+  Map1D,
+  Map2D,
   MapVec,
   Pitch,
   TonalContext,
+  TuningMap,
   WICKI_FROM,
   WICKI_TO
 };

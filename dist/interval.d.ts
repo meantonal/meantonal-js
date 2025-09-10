@@ -48,6 +48,10 @@ export declare class Interval {
      */
     get pc12(): number;
     /**
+     * The standard name for an interval.
+     */
+    get name(): string;
+    /**
      * Returns true if two Interval vectors are identical.
      * Note this will NOT return true for notes that are merely enharmonic in
      * 12TET (use the "isEnharmonic" method for that).

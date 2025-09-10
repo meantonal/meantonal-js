@@ -3,7 +3,7 @@ import { Interval } from "./interval";
 import { Pitch } from "./pitch";
 
 /**
- * An indeterminate vector type to be used with the Map1d and Map2d classes.
+ * An indeterminate vector type to be used with the Map1D and Map2D classes.
  * Can be converted to Pitch or Interval vectors as needed using its methods.
  */
 export class MapVec {
@@ -35,7 +35,7 @@ export class MapVec {
  * Represents a 1x2 matrix. Used to effect an arbitrary linear map from
  * 2d vectors down to 1d numbers.
  */
-export class Map1d {
+export class Map1D {
     private m0: number;
     private m1: number;
 
@@ -58,7 +58,7 @@ export class Map1d {
  * Represents a 2x2 matrix. Used to effect an arbitrary basis change from one
  * coordinates system to another.
  */
-export class Map2d {
+export class Map2D {
     private m00: number;
     private m01: number;
     private m10: number;
@@ -98,7 +98,7 @@ export class Map2d {
 export class TuningMap {
     private referencePitch: Pitch;
     private referenceFreq: number;
-    private centMap: Map1d;
+    private centMap: Map1D;
 
     constructor(
         fifth: number,
@@ -108,7 +108,7 @@ export class TuningMap {
         this.referencePitch = Pitch.fromSPN(referencePitch);
         this.referenceFreq = referenceFreq;
 
-        this.centMap = new Map1d(fifth, 1200);
+        this.centMap = new Map1D(fifth, 1200);
     }
 
     /**

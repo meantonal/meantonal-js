@@ -1,4 +1,4 @@
-import { Map1d, Map2d } from "./map";
+import { Map1D, Map2D } from "./map";
 
 /**
  * Used to map modes to numbers in certain methods.
@@ -29,18 +29,18 @@ export const LETTER_COORDS = [
     { w: 5, h: 1 }, // B
 ];
 
-export const EDO7 = new Map1d(1, 1);
-export const EDO12 = new Map1d(2, 1);
-export const EDO17 = new Map1d(3, 1);
-export const EDO19 = new Map1d(3, 2);
-export const EDO22 = new Map1d(4, 1);
-export const EDO31 = new Map1d(5, 3);
-export const EDO50 = new Map1d(8, 5);
-export const EDO53 = new Map1d(9, 4);
-export const EDO55 = new Map1d(9, 5);
-export const EDO81 = new Map1d(13, 8);
+export const EDO7 = new Map1D(1, 1);
+export const EDO12 = new Map1D(2, 1);
+export const EDO17 = new Map1D(3, 1);
+export const EDO19 = new Map1D(3, 2);
+export const EDO22 = new Map1D(4, 1);
+export const EDO31 = new Map1D(5, 3);
+export const EDO50 = new Map1D(8, 5);
+export const EDO53 = new Map1D(9, 4);
+export const EDO55 = new Map1D(9, 5);
+export const EDO81 = new Map1D(13, 8);
 
-export const WICKI_TO = new Map2d(1, -3, 0, 1);
-export const WICKI_FROM = new Map2d(1, 3, 0, 1);
-export const GENERATORS_TO = new Map2d(2, -5, -1, 3);
-export const GENERATORS_FROM = new Map2d(3, 5, 1, 2);
+export const WICKI_TO = new Map2D(1, -3, 0, 1);
+export const WICKI_FROM = new Map2D(1, 3, 0, 1);
+export const GENERATORS_TO = new Map2D(2, -5, -1, 3);
+export const GENERATORS_FROM = new Map2D(3, 5, 1, 2);

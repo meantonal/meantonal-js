@@ -51,9 +51,13 @@ export declare class Pitch {
      */
     get accidental(): number;
     /**
-     * The octave number of a note (in SPN numbering).
+     * The octave number of a Pitch (in SPN numbering).
      */
     get octave(): number;
+    /**
+     * The SPN name of a Pitch.
+     */
+    get SPN(): string;
     /**
      * Returns true if two Pitch vectors are identical.
      * Note this will NOT return true for notes that are merely enharmonic in

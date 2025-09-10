@@ -17,7 +17,7 @@ export {
     GENERATORS_FROM,
 } from "./constants";
 export { Chroma } from "./chroma";
-export { MapVec, Map1d, Map2d, TuningMap } from "./map";
+export { MapVec, Map1D, Map2D, TuningMap } from "./map";
 export { Pitch, Axis } from "./pitch";
 export { Interval } from "./interval";
 export { TonalContext } from "./tonality";

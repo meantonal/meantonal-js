@@ -100,6 +100,15 @@ test("Pitch.octave produces correct result", () => {
     expect(p.octave).toBe(-1);
 });
 
+test("Pitch.octave produces correct result", () => {
+    let p = Pitch.fromSPN("C4");
+    expect(p.SPN).toBe("C4");
+    p = Pitch.fromSPN("Cx-1");
+    expect(p.SPN).toBe("Cx-1");
+    p = Pitch.fromSPN("Gbbbb7");
+    expect(p.SPN).toBe("Gbbbb7");
+});
+
 test("Pitch.equal produces correct result", () => {
     let p = Pitch.fromSPN("C#4");
     let q = Pitch.fromSPN("C#5");

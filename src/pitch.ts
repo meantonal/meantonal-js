@@ -117,10 +117,23 @@ export class Pitch {
     }
 
     /**
-     * The octave number of a note (in SPN numbering).
+     * The octave number of a Pitch (in SPN numbering).
      */
     public get octave(): number {
         return Math.floor((this.w + this.h) / 7 - 1);
+    }
+
+    /**
+     * The SPN name of a Pitch.
+     */
+    public get SPN(): string {
+        let result = this.letter;
+        let accidental = this.accidental;
+        if (this.accidental == 2) result += "x";
+        else if (this.accidental > 0) result += "#".repeat(accidental);
+        if (this.accidental < 0) result += "b".repeat(-accidental);
+        result += this.octave.toString();
+        return result;
     }
 
     /**

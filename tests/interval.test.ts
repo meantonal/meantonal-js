@@ -119,14 +119,16 @@ test("Interval.quality produces correct result", () => {
     expect(m.quality).toEqual(3);
     m = Interval.fromName("dd4");
     expect(m.quality).toEqual(-3);
+    m = Interval.fromName("dd6");
+    expect(m.quality).toEqual(-3);
 });
 
 test("Interval.stepspan produces correct result", () => {
-    let m = Interval.fromName("M6");
+    let m = Interval.fromName("A6");
+    expect(m.stepspan).toEqual(5);
+    m = Interval.fromName("M6");
     expect(m.stepspan).toEqual(5);
     m = Interval.fromName("m6");
-    expect(m.stepspan).toEqual(5);
-    m = Interval.fromName("A6");
     expect(m.stepspan).toEqual(5);
     m = Interval.fromName("d6");
     expect(m.stepspan).toEqual(5);
@@ -154,6 +156,39 @@ test("Interval.pc12 produces correct result", () => {
     expect(m.pc12).toEqual(2);
     m = Interval.fromName("P8");
     expect(m.pc12).toEqual(0);
+});
+
+test("Interval.name produces correct result", () => {
+    let name = "AA5";
+    let m = Interval.fromName(name);
+    expect(m.name).toEqual(name);
+    name = "A5";
+    m = Interval.fromName(name);
+    expect(m.name).toEqual(name);
+    name = "P5";
+    m = Interval.fromName(name);
+    expect(m.name).toEqual(name);
+    name = "d5";
+    m = Interval.fromName(name);
+    expect(m.name).toEqual(name);
+    name = "dd5";
+    m = Interval.fromName(name);
+    expect(m.name).toEqual(name);
+    name = "A6";
+    m = Interval.fromName(name);
+    expect(m.name).toEqual(name);
+    name = "M6";
+    m = Interval.fromName(name);
+    expect(m.name).toEqual(name);
+    name = "m6";
+    m = Interval.fromName(name);
+    expect(m.name).toEqual(name);
+    name = "d6";
+    m = Interval.fromName(name);
+    expect(m.name).toEqual(name);
+    name = "dd6";
+    m = Interval.fromName(name);
+    expect(m.name).toEqual(name);
 });
 
 test("Interval.isEqual produces correct result", () => {

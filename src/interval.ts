@@ -46,24 +46,17 @@ export class Interval {
         h += 2 * octave;
 
         let qualityAdjustment = 0;
-        accidentalStr.split("").forEach((x) => {
-            switch (x) {
-                case "A":
-                case "a":
-                case "#":
-                    qualityAdjustment++;
-                    break;
-                case "m":
-                case "b":
-                    qualityAdjustment--;
-                    break;
-                case "D":
-                case "d":
-                    if (simple === 0 || simple === 3 || simple === 4) qualityAdjustment--;
-                    else qualityAdjustment -= 2;
-                    break;
-            }
-        });
+        let splitStr = accidentalStr.split("");
+
+        qualityAdjustment += splitStr.filter(
+            (x) => x === "A" || x === "a" || x === "#",
+        ).length;
+        qualityAdjustment -= splitStr.filter((x) => x === "m" || x === "b").length;
+        const dims = splitStr.filter((x) => x === "D" || x === "d").length;
+        qualityAdjustment -= dims;
+        if (dims !== 0 && simple !== 0 && simple !== 3 && simple !== 4)
+            qualityAdjustment--;
+
         w += qualityAdjustment;
         h -= qualityAdjustment;
 
@@ -107,7 +100,7 @@ export class Interval {
         if (this.chroma < 0 && this.chroma >= -5)
             return Math.ceil((this.chroma - 5) / 7);
         if (this.chroma > 5) return Math.floor((this.chroma + 8) / 7);
-        return Math.ceil((this.chroma - 8) / 7);
+        return Math.floor((this.chroma - 2) / 7);
     }
 
     /**
@@ -131,6 +124,21 @@ export class Interval {
      */
     public get pc12(): number {
         return (((this.w * 2 + this.h) % 12) + 12) % 12;
+    }
+
+    /**
+     * The standard name for an interval.
+     */
+    public get name() {
+        let result = "";
+        const quality = this.quality;
+        if (quality > 1) result += "A".repeat(quality - 1);
+        if (quality === 1) result += "M";
+        if (quality === 0) result += "P";
+        if (quality === -1) result += "m";
+        if (quality < -1) result += "d".repeat(-quality - 1);
+        result += (this.stepspan + 1).toString();
+        return result;
     }
 
     /**

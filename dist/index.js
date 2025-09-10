@@ -344,23 +344,23 @@ var Interval = class _Interval {
 
 // src/map.ts
 var MapVec = class {
-  constructor(w, h) {
-    this.w = w;
-    this.h = h;
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
   }
   /**
    * Converts a MapVec into a Pitch vector.
    * Returns a new vector. Does not modify the MapVec.
    */
   toPitch() {
-    return new Pitch(this.w, this.h);
+    return new Pitch(this.x, this.y);
   }
   /**
    * Converts a MapVec into an Interval vector.
    * Returns a new vector. Does not modify the MapVec.
    */
   toInterval() {
-    return new Interval(this.w, this.h);
+    return new Interval(this.x, this.y);
   }
 };
 var Map1d = class {
@@ -373,6 +373,7 @@ var Map1d = class {
    * Returns a number.
    */
   map(v) {
+    if (v instanceof MapVec) return this.m0 * v.x + this.m1 * v.y;
     return this.m0 * v.w + this.m1 * v.h;
   }
 };
@@ -388,6 +389,11 @@ var Map2d = class {
    * Returns a MapVec.
    */
   map(v) {
+    if (v instanceof MapVec)
+      return new MapVec(
+        this.m00 * v.x + this.m01 * v.y,
+        this.m10 * v.x + this.m11 * v.y
+      );
     return new MapVec(
       this.m00 * v.w + this.m01 * v.h,
       this.m10 * v.w + this.m11 * v.h

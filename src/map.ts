@@ -6,11 +6,11 @@ import { Pitch } from "./pitch";
  * Can be converted to Pitch or Interval vectors as needed using its methods.
  */
 export class MapVec {
-    w: number;
-    h: number;
-    constructor(w: number, h: number) {
-        this.w = w;
-        this.h = h;
+    x: number;
+    y: number;
+    constructor(x: number, y: number) {
+        this.x = x;
+        this.y = y;
     }
 
     /**
@@ -18,7 +18,7 @@ export class MapVec {
      * Returns a new vector. Does not modify the MapVec.
      */
     public toPitch() {
-        return new Pitch(this.w, this.h);
+        return new Pitch(this.x, this.y);
     }
 
     /**
@@ -26,7 +26,7 @@ export class MapVec {
      * Returns a new vector. Does not modify the MapVec.
      */
     public toInterval() {
-        return new Interval(this.w, this.h);
+        return new Interval(this.x, this.y);
     }
 }
 
@@ -48,6 +48,7 @@ export class Map1d {
      * Returns a number.
      */
     public map(v: MapVec | Pitch | Interval): number {
+        if (v instanceof MapVec) return this.m0 * v.x + this.m1 * v.y;
         return this.m0 * v.w + this.m1 * v.h;
     }
 }
@@ -74,6 +75,12 @@ export class Map2d {
      * Returns a MapVec.
      */
     public map(v: MapVec | Pitch | Interval): MapVec {
+        if (v instanceof MapVec)
+            return new MapVec(
+                this.m00 * v.x + this.m01 * v.y,
+                this.m10 * v.x + this.m11 * v.y,
+            );
+
         return new MapVec(
             this.m00 * v.w + this.m01 * v.h,
             this.m10 * v.w + this.m11 * v.h,

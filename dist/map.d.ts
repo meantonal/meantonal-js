@@ -5,9 +5,9 @@ import { Pitch } from "./pitch";
  * Can be converted to Pitch or Interval vectors as needed using its methods.
  */
 export declare class MapVec {
-    w: number;
-    h: number;
-    constructor(w: number, h: number);
+    x: number;
+    y: number;
+    constructor(x: number, y: number);
     /**
      * Converts a MapVec into a Pitch vector.
      * Returns a new vector. Does not modify the MapVec.

@@ -1,7 +1,8 @@
-# Table of Contents
+## Table of Contents
 
 - [Meantonal](#meantonal)
 - [Installation](#installation)
+- [Documentation](#documentation)
 
 <img align="left" src="/logo.svg" width="48">
   
@@ -18,7 +19,7 @@ Meantonal is:
 
 For the C implementation of Meantonal [click here](https://github.com/meantonal/meantonal-c).
 
-# Installation
+## Installation
 
 Adding Meantonal to your project is as simple as running:
 
@@ -47,3 +48,7 @@ let axis = Axis.fromSPN("D4", "A4");
 
 q = q.invert(axis); // q is now G#4
 ```
+
+## Documentation
+
+A full reference of the TypeScript implementation of Meantonal can be found [here](https://meantonal.org/js)

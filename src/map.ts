@@ -1,3 +1,4 @@
+import { GENERATORS_TO } from "./constants";
 import { Interval } from "./interval";
 import { Pitch } from "./pitch";
 
@@ -85,5 +86,63 @@ export class Map2d {
             this.m00 * v.w + this.m01 * v.h,
             this.m10 * v.w + this.m11 * v.h,
         );
+    }
+}
+
+/**
+ * Represents a map onto a given tuning system. Specified in terms of the width
+ * of its fifth, and the name and frequency of a reference pitch in Hz
+ * (e.g. A = 440).
+ * - Reference pitch is optional, defaults to C4 = 261.6255653Hz.
+ */
+export class TuningMap {
+    private referencePitch: Pitch;
+    private referenceFreq: number;
+    private centMap: Map1d;
+
+    constructor(
+        fifth: number,
+        referencePitch: string = "C4",
+        referenceFreq: number = 261.6255653,
+    ) {
+        this.referencePitch = Pitch.fromSPN(referencePitch);
+        this.referenceFreq = referenceFreq;
+
+        this.centMap = new Map1d(fifth, 1200);
+    }
+
+    /**
+     * Initialises an EDO tuning map by specifying the number of parts to
+     * divide the octave into rather than the width of the fifth in cents.
+     */
+    static fromEDO(
+        edo: number,
+        referencePitch: string = "C4",
+        referenceFreq: number = 261.6255653,
+    ) {
+        const fifthSteps = Math.round(Math.log2(1.5) * edo);
+        const fifth = (fifthSteps * 1200) / edo;
+        return new TuningMap(fifth, referencePitch, referenceFreq);
+    }
+
+    /**
+     * Renders the frequency of a Pitch vector in Hertz.
+     */
+    toHz(p: Pitch) {
+        return (
+            this.referenceFreq *
+            2 **
+            (this.centMap.map(
+                GENERATORS_TO.map(this.referencePitch.intervalTo(p)),
+            ) /
+                1200)
+        );
+    }
+
+    /**
+     * Renders the width of an Interval in cents.
+     */
+    toCents(m: Interval) {
+        return this.centMap.map(GENERATORS_TO.map(m));
     }
 }

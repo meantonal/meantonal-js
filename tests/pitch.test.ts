@@ -22,6 +22,24 @@ test("Pitch.fronSPN creates correct Pitch vector", () => {
     expect(p.h).toBe(12);
 });
 
+test("Pitch.fronLily creates correct Pitch vector", () => {
+    let p = Pitch.fromLily("c'");
+    expect(p.w).toBe(25);
+    expect(p.h).toBe(10);
+    p = Pitch.fromLily("c,,,,");
+    expect(p.w).toBe(0);
+    expect(p.h).toBe(0);
+    p = Pitch.fromLily("fisis'");
+    expect(p.w).toBe(29);
+    expect(p.h).toBe(9);
+    p = Pitch.fromLily("ees'");
+    expect(p.w).toBe(26);
+    expect(p.h).toBe(11);
+    p = Pitch.fromLily("eeses'");
+    expect(p.w).toBe(25);
+    expect(p.h).toBe(12);
+});
+
 test("Pitch.fromChroma creates correct Pitch vector", () => {
     let p = Pitch.fromChroma(0, 4);
     expect(p.w).toBe(25);
@@ -100,13 +118,28 @@ test("Pitch.octave produces correct result", () => {
     expect(p.octave).toBe(-1);
 });
 
-test("Pitch.octave produces correct result", () => {
+test("Pitch.SPN produces correct result", () => {
     let p = Pitch.fromSPN("C4");
     expect(p.SPN).toBe("C4");
     p = Pitch.fromSPN("Cx-1");
     expect(p.SPN).toBe("Cx-1");
     p = Pitch.fromSPN("Gbbbb7");
     expect(p.SPN).toBe("Gbbbb7");
+});
+
+test("Pitch.Lily produces correct result", () => {
+    let lily = "c'";
+    let p = Pitch.fromLily(lily);
+    expect(p.lily).toBe(lily);
+    lily = "aes";
+    p = Pitch.fromLily(lily);
+    expect(p.lily).toBe(lily);
+    lily = "gisis'''";
+    p = Pitch.fromLily(lily);
+    expect(p.lily).toBe(lily);
+    lily = "eeses,,,,";
+    p = Pitch.fromLily(lily);
+    expect(p.lily).toBe(lily);
 });
 
 test("Pitch.equal produces correct result", () => {

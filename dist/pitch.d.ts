@@ -19,6 +19,10 @@ export declare class Pitch {
      */
     static fromLily(str: string): Pitch;
     /**
+     * Create a Pitch vector from a Helmholtz note name.
+     */
+    static fromHelmholtz(str: string): Pitch;
+    /**
      * Create a Pitch vector from a chroma value (the signed distance of a note
      * name from "C" in perfect fifths), and an octave number (in SPN numbering).
      */
@@ -66,6 +70,10 @@ export declare class Pitch {
      * The LilyPond name of a Pitch.
      */
     get lily(): string;
+    /**
+     * The Helmholtz name of a Pitch.
+     */
+    get helmholtz(): string;
     /**
      * Returns true if two Pitch vectors are identical.
      * Note this will NOT return true for notes that are merely enharmonic in

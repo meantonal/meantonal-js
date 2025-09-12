@@ -16,7 +16,7 @@ var Pitch = class _Pitch {
     }
     const [, letter, accidentalStr = "", octaveStr] = match;
     const octave = parseInt(octaveStr, 10) + 1;
-    let { w, h } = LETTER_COORDS["CDEFGAB".indexOf(letter)];
+    let { w, h } = LETTER_COORDS["CDEFGAB".indexOf(letter.toUpperCase())];
     let accidental = 0;
     const accidentalArray = accidentalStr.split("");
     accidental += accidentalArray.filter((x) => x === "#").length;
@@ -52,6 +52,34 @@ var Pitch = class _Pitch {
     let { w, h } = LETTER_COORDS["cdefgab".indexOf(letter)];
     w += accidental;
     h -= accidental;
+    w += 5 * octave;
+    h += 2 * octave;
+    return new _Pitch(w, h);
+  }
+  /**
+   * Create a Pitch vector from a Helmholtz note name.
+   */
+  static fromHelmholtz(str) {
+    const regex = /^([A-Ga-g])([#bxw]+)?((?:'|,)*)$/;
+    const match = str.match(regex);
+    if (!match) {
+      throw new Error(`Invalid Helmholtz string: ${str}`);
+    }
+    const [, letter, accidentalStr = "", octaveStr] = match;
+    let { w, h } = LETTER_COORDS["CDEFGAB".indexOf(letter.toUpperCase())];
+    let accidental = 0;
+    const accidentalArray = accidentalStr.split("");
+    accidental += accidentalArray.filter((x) => x === "#").length;
+    accidental += 2 * accidentalArray.filter((x) => x === "x").length;
+    accidental -= accidentalArray.filter((x) => x === "b").length;
+    accidental -= 2 * accidentalArray.filter((x) => x === "w").length;
+    w += accidental;
+    h -= accidental;
+    let octave = 0;
+    if (letter.match(/[A-G]/))
+      octave = 3 - octaveStr.split("").filter((x) => x === ",").length;
+    if (letter.match(/[a-g]/))
+      octave = 4 + octaveStr.split("").filter((x) => x === "'").length;
     w += 5 * octave;
     h += 2 * octave;
     return new _Pitch(w, h);
@@ -147,6 +175,22 @@ var Pitch = class _Pitch {
     const octave = this.octave - 3;
     if (octave > 0) result += "'".repeat(octave);
     if (octave < 0) result += ",".repeat(-octave);
+    return result;
+  }
+  /**
+   * The Helmholtz name of a Pitch.
+   */
+  get helmholtz() {
+    let result;
+    const accNumber = this.accidental;
+    let accidental = "";
+    if (accNumber == 2) accidental += "x";
+    else if (accNumber > 0) accidental += "#".repeat(accNumber);
+    if (accNumber < 0) accidental += "b".repeat(-accNumber);
+    let octave = this.octave;
+    if (octave > 2)
+      result = this.letter.toLowerCase() + accidental + "'".repeat(octave - 3);
+    else result = this.letter + accidental + ",".repeat(2 - octave);
     return result;
   }
   /**

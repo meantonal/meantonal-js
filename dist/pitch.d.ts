@@ -11,18 +11,6 @@ export declare class Pitch {
     h: number;
     constructor(w: number, h: number);
     /**
-     * Create a Pitch vector from a Scientific Pitch Notation string.
-     */
-    static fromSPN(spn: string): Pitch;
-    /**
-     * Create a Pitch vector from a LilyPond note name
-     */
-    static fromLily(str: string): Pitch;
-    /**
-     * Create a Pitch vector from a Helmholtz note name.
-     */
-    static fromHelmholtz(str: string): Pitch;
-    /**
      * Create a Pitch vector from a chroma value (the signed distance of a note
      * name from "C" in perfect fifths), and an octave number (in SPN numbering).
      */
@@ -62,18 +50,6 @@ export declare class Pitch {
      * The octave number of a Pitch (in SPN numbering).
      */
     get octave(): number;
-    /**
-     * The SPN name of a Pitch.
-     */
-    get SPN(): string;
-    /**
-     * The LilyPond name of a Pitch.
-     */
-    get lily(): string;
-    /**
-     * The Helmholtz name of a Pitch.
-     */
-    get helmholtz(): string;
     /**
      * Returns true if two Pitch vectors are identical.
      * Note this will NOT return true for notes that are merely enharmonic in
@@ -138,9 +114,4 @@ export declare class Axis {
     w: number;
     h: number;
     constructor(p: Pitch, q: Pitch);
-    /**
-     * Create an Axis from two SPN strings specifying notes.
-     * e.g. Axis.fromSPN("C4", "G4");
-     */
-    static fromSPN(ps: string, qs: string): Axis;
 }

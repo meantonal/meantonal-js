@@ -1,4 +1,4 @@
-import { Interval, Pitch } from "../src";
+import { Interval, SPN } from "../src";
 
 test("Interval.fromName creates correct Interval vector", () => {
     let m = Interval.fromName("P5");
@@ -41,8 +41,8 @@ test("Interval.fromSPN creates correct Interval vector", () => {
 });
 
 test("Interval.between creates correct Interval vector", () => {
-    let p = Pitch.fromSPN("C4");
-    let q = Pitch.fromSPN("E4");
+    let p = SPN.toPitch("C4");
+    let q = SPN.toPitch("E4");
     expect(Interval.between(p, q)).toEqual(Interval.fromName("M3"));
 });
 

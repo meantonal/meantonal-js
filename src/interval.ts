@@ -1,3 +1,4 @@
+import { SPN } from "./parse/spn";
 import { Pitch } from "./pitch";
 
 /**
@@ -65,10 +66,10 @@ export class Interval {
 
     /**
      * Create an Interval from two pitch names as SPN strings.
-     * - e.g. Pitch.fromSPN("C4", "E4"); // produces a major 3rd.
+     * - e.g. SPN.toPitch("C4", "E4"); // produces a major 3rd.
      */
     static fromSPN(ps: string, qs: string) {
-        return Interval.between(Pitch.fromSPN(ps), Pitch.fromSPN(qs));
+        return Interval.between(SPN.toPitch(ps), SPN.toPitch(qs));
     }
 
     /**

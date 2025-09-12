@@ -1,4 +1,3 @@
-import { LETTER_COORDS } from "./constants";
 import { Interval } from "./interval";
 import { TonalContext } from "./tonality";
 
@@ -15,105 +14,6 @@ export class Pitch {
     constructor(w: number, h: number) {
         this.w = w;
         this.h = h;
-    }
-
-    /**
-     * Create a Pitch vector from a Scientific Pitch Notation string.
-     */
-    static fromSPN(spn: string): Pitch {
-        const regex = /^([A-Ga-g])([#bxw]+)?(-?\d+)$/;
-        const match = spn.match(regex);
-        if (!match) {
-            throw new Error(`Invalid SPN: ${spn}`);
-        }
-
-        const [, letter, accidentalStr = "", octaveStr] = match;
-        const octave = parseInt(octaveStr, 10) + 1;
-
-        let { w, h } = LETTER_COORDS["CDEFGAB".indexOf(letter.toUpperCase())];
-
-        let accidental = 0;
-        const accidentalArray = accidentalStr.split("");
-        accidental += accidentalArray.filter((x) => x === "#").length;
-        accidental += 2 * accidentalArray.filter((x) => x === "x").length;
-        accidental -= accidentalArray.filter((x) => x === "b").length;
-        accidental -= 2 * accidentalArray.filter((x) => x === "w").length;
-
-        w += accidental;
-        h -= accidental;
-        w += 5 * octave;
-        h += 2 * octave;
-
-        return new Pitch(w, h);
-    }
-
-    /**
-     * Create a Pitch vector from a LilyPond note name
-     */
-    static fromLily(str: string): Pitch {
-        const regex = /^([a-g])((?:is|es)*)((?:'|,)*)$/;
-        const match = str.match(regex);
-        if (!match) {
-            throw new Error(`Invalid LilyPond note name: ${str}`);
-        }
-
-        const [, letter, accidentalStr, octaveStr] = match;
-
-        let accidental = accidentalStr.split("s").reduce((a, c) => {
-            if (c === "i") return a + 1;
-            if (c === "e") return a - 1;
-            return a;
-        }, 0);
-
-        const octave =
-            4 +
-            octaveStr.split("").reduce((a, c) => {
-                if (c === "'") return a + 1;
-                if (c === ",") return a - 1;
-                return a;
-            }, 0);
-
-        let { w, h } = LETTER_COORDS["cdefgab".indexOf(letter)];
-        w += accidental;
-        h -= accidental;
-        w += 5 * octave;
-        h += 2 * octave;
-
-        return new Pitch(w, h);
-    }
-
-    /**
-     * Create a Pitch vector from a Helmholtz note name.
-     */
-    static fromHelmholtz(str: string) {
-        const regex = /^([A-Ga-g])([#bxw]+)?((?:'|,)*)$/;
-        const match = str.match(regex);
-        if (!match) {
-            throw new Error(`Invalid Helmholtz string: ${str}`);
-        }
-
-        const [, letter, accidentalStr = "", octaveStr] = match;
-
-        let { w, h } = LETTER_COORDS["CDEFGAB".indexOf(letter.toUpperCase())];
-
-        let accidental = 0;
-        const accidentalArray = accidentalStr.split("");
-        accidental += accidentalArray.filter((x) => x === "#").length;
-        accidental += 2 * accidentalArray.filter((x) => x === "x").length;
-        accidental -= accidentalArray.filter((x) => x === "b").length;
-        accidental -= 2 * accidentalArray.filter((x) => x === "w").length;
-        w += accidental;
-        h -= accidental;
-
-        let octave = 0;
-        if (letter.match(/[A-G]/))
-            octave = 3 - octaveStr.split("").filter((x) => x === ",").length;
-        if (letter.match(/[a-g]/))
-            octave = 4 + octaveStr.split("").filter((x) => x === "'").length;
-        w += 5 * octave;
-        h += 2 * octave;
-
-        return new Pitch(w, h);
     }
 
     /**
@@ -190,58 +90,6 @@ export class Pitch {
      */
     public get octave(): number {
         return Math.floor((this.w + this.h) / 7 - 1);
-    }
-
-    /**
-     * The SPN name of a Pitch.
-     */
-    public get SPN(): string {
-        let result = this.letter;
-
-        const accidental = this.accidental;
-        if (accidental == 2) result += "x";
-        else if (accidental > 0) result += "#".repeat(accidental);
-        if (accidental < 0) result += "b".repeat(-accidental);
-
-        result += this.octave.toString();
-
-        return result;
-    }
-
-    /**
-     * The LilyPond name of a Pitch.
-     */
-    public get lily(): string {
-        let result = this.letter.toLowerCase();
-
-        const accidental = this.accidental;
-        if (accidental > 0) result += "is".repeat(accidental);
-        if (accidental < 0) result += "es".repeat(-accidental);
-
-        const octave = this.octave - 3;
-        if (octave > 0) result += "'".repeat(octave);
-        if (octave < 0) result += ",".repeat(-octave);
-
-        return result;
-    }
-
-    /**
-     * The Helmholtz name of a Pitch.
-     */
-    public get helmholtz(): string {
-        let result;
-        const accNumber = this.accidental;
-        let accidental = "";
-        if (accNumber == 2) accidental += "x";
-        else if (accNumber > 0) accidental += "#".repeat(accNumber);
-        if (accNumber < 0) accidental += "b".repeat(-accNumber);
-
-        let octave = this.octave;
-        if (octave > 2)
-            result = this.letter.toLowerCase() + accidental + "'".repeat(octave - 3);
-        else result = this.letter + accidental + ",".repeat(2 - octave);
-
-        return result;
     }
 
     /**
@@ -338,13 +186,5 @@ export class Axis {
     constructor(p: Pitch, q: Pitch) {
         this.w = p.w + q.w;
         this.h = p.h + q.h;
-    }
-
-    /**
-     * Create an Axis from two SPN strings specifying notes.
-     * e.g. Axis.fromSPN("C4", "G4");
-     */
-    static fromSPN(ps: string, qs: string) {
-        return new Axis(Pitch.fromSPN(ps), Pitch.fromSPN(qs));
     }
 }

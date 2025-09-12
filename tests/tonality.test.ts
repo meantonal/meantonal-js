@@ -1,4 +1,4 @@
-import { Pitch, TonalContext } from "../src";
+import { SPN, TonalContext } from "../src";
 
 test("TonalContext.fromStrings creates the correct TonalContext", () => {
     let context = TonalContext.fromStrings("Eb", "Phrygian");
@@ -10,23 +10,23 @@ test("TonalContext.fromStrings creates the correct TonalContext", () => {
 
 test("TonalContext.degreeNumber produces correct result", () => {
     let context = new TonalContext(0, 1);
-    let p = Pitch.fromSPN("C4");
+    let p = SPN.toPitch("C4");
     expect(p.degreeIn(context)).toEqual(0);
-    p = Pitch.fromSPN("D4");
+    p = SPN.toPitch("D4");
     expect(p.degreeIn(context)).toEqual(1);
-    p = Pitch.fromSPN("E4");
+    p = SPN.toPitch("E4");
     expect(p.degreeIn(context)).toEqual(2);
-    p = Pitch.fromSPN("F4");
+    p = SPN.toPitch("F4");
     expect(p.degreeIn(context)).toEqual(3);
-    p = Pitch.fromSPN("G4");
+    p = SPN.toPitch("G4");
     expect(p.degreeIn(context)).toEqual(4);
-    p = Pitch.fromSPN("A4");
+    p = SPN.toPitch("A4");
     expect(p.degreeIn(context)).toEqual(5);
-    p = Pitch.fromSPN("B4");
+    p = SPN.toPitch("B4");
     expect(p.degreeIn(context)).toEqual(6);
-    p = Pitch.fromSPN("C#4");
+    p = SPN.toPitch("C#4");
     expect(p.degreeIn(context)).toEqual(0);
-    p = Pitch.fromSPN("Db4");
+    p = SPN.toPitch("Db4");
     expect(p.degreeIn(context)).toEqual(1);
     context = new TonalContext(0, 5);
     expect(p.degreeIn(context)).toEqual(1);
@@ -34,20 +34,20 @@ test("TonalContext.degreeNumber produces correct result", () => {
 
 test("TonalContext.degreeAlteration produces correct result", () => {
     let context = new TonalContext(0, 1);
-    let p = Pitch.fromSPN("C4");
+    let p = SPN.toPitch("C4");
     expect(p.alterationIn(context)).toEqual(0);
-    p = Pitch.fromSPN("C#4");
+    p = SPN.toPitch("C#4");
     expect(p.alterationIn(context)).toEqual(1);
-    p = Pitch.fromSPN("Cb4");
+    p = SPN.toPitch("Cb4");
     expect(p.alterationIn(context)).toEqual(-2);
-    p = Pitch.fromSPN("Db4");
+    p = SPN.toPitch("Db4");
     expect(p.alterationIn(context)).toEqual(-1);
-    p = Pitch.fromSPN("E#4");
+    p = SPN.toPitch("E#4");
     expect(p.alterationIn(context)).toEqual(2);
     context = new TonalContext(0, 4);
-    p = Pitch.fromSPN("Cb4");
+    p = SPN.toPitch("Cb4");
     expect(p.alterationIn(context)).toEqual(-1);
-    p = Pitch.fromSPN("A#4");
+    p = SPN.toPitch("A#4");
     expect(p.alterationIn(context)).toEqual(2);
 });
 
@@ -64,23 +64,23 @@ test("TonalContext.degreeChroma produces correct result", () => {
 
 test("TonalContext.snapDiatonic produces correct result", () => {
     let context = new TonalContext(2, 1);
-    let p = Pitch.fromSPN("Eb4");
-    let q = Pitch.fromSPN("E4");
+    let p = SPN.toPitch("Eb4");
+    let q = SPN.toPitch("E4");
     expect(p.snapTo(context).isEqual(q)).toBeTruthy();
-    p = Pitch.fromSPN("E#4");
+    p = SPN.toPitch("E#4");
     expect(p.snapTo(context).isEqual(q)).toBeTruthy();
-    p = Pitch.fromSPN("Bb4");
-    q = Pitch.fromSPN("B4");
+    p = SPN.toPitch("Bb4");
+    q = SPN.toPitch("B4");
     expect(p.snapTo(context).isEqual(q)).toBeTruthy();
 });
 
 test("Pitch.transposeDiatonic produces correct result", () => {
     let context = new TonalContext(2, 1);
-    let p = Pitch.fromSPN("D4");
-    let q = Pitch.fromSPN("E4");
+    let p = SPN.toPitch("D4");
+    let q = SPN.toPitch("E4");
     expect(p.transposeDiatonic(1, context).isEqual(q)).toBeTruthy();
-    p = Pitch.fromSPN("D#4");
+    p = SPN.toPitch("D#4");
     expect(p.transposeDiatonic(1, context).isEqual(q)).toBeTruthy();
-    q = Pitch.fromSPN("A3");
+    q = SPN.toPitch("A3");
     expect(p.transposeDiatonic(-3, context).isEqual(q)).toBeTruthy();
 });

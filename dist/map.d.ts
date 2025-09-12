@@ -66,11 +66,15 @@ export declare class TuningMap {
      */
     static fromEDO(edo: number, referencePitch?: string, referenceFreq?: number): TuningMap;
     /**
-     * Renders the frequency of a Pitch vector in Hertz.
-     */
-    toHz(p: Pitch): number;
-    /**
      * Renders the width of an Interval in cents.
      */
     toCents(m: Interval): number;
+    /**
+     * Renders the ratio of an Interval vector as a decimal number.
+     */
+    toRatio(m: Interval): number;
+    /**
+     * Renders the frequency of a Pitch vector in Hertz.
+     */
+    toHz(p: Pitch): number;
 }

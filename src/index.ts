@@ -18,6 +18,9 @@ export {
 } from "./constants";
 export { Chroma } from "./chroma";
 export { MapVec, Map1D, Map2D, TuningMap } from "./map";
+export { SPN } from "./parse/spn";
+export { LilyPond } from "./parse/lily";
+export { Helmholtz } from "./parse/helmholtz";
 export { Pitch, Axis } from "./pitch";
 export { Interval } from "./interval";
 export { TonalContext } from "./tonality";

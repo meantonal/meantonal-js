@@ -1,5 +1,6 @@
 import { GENERATORS_TO } from "./constants";
 import { Interval } from "./interval";
+import { SPN } from "./parse/spn";
 import { Pitch } from "./pitch";
 
 /**
@@ -105,7 +106,7 @@ export class TuningMap {
         referencePitch: string = "C4",
         referenceFreq: number = 261.6255653,
     ) {
-        this.referencePitch = Pitch.fromSPN(referencePitch);
+        this.referencePitch = SPN.toPitch(referencePitch);
         this.referenceFreq = referenceFreq;
 
         this.centMap = new Map1D(fifth, 1200);
@@ -126,23 +127,23 @@ export class TuningMap {
     }
 
     /**
-     * Renders the frequency of a Pitch vector in Hertz.
-     */
-    toHz(p: Pitch) {
-        return (
-            this.referenceFreq *
-            2 **
-            (this.centMap.map(
-                GENERATORS_TO.map(this.referencePitch.intervalTo(p)),
-            ) /
-                1200)
-        );
-    }
-
-    /**
      * Renders the width of an Interval in cents.
      */
     toCents(m: Interval) {
         return this.centMap.map(GENERATORS_TO.map(m));
+    }
+
+    /**
+     * Renders the ratio of an Interval vector as a decimal number.
+     */
+    toRatio(m: Interval) {
+        return 2 ** (this.toCents(m) / 1200);
+    }
+
+    /**
+     * Renders the frequency of a Pitch vector in Hertz.
+     */
+    toHz(p: Pitch) {
+        return this.referenceFreq * this.toRatio(this.referencePitch.intervalTo(p));
     }
 }

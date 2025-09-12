@@ -30,6 +30,33 @@ var Pitch = class _Pitch {
     return new _Pitch(w, h);
   }
   /**
+   * Create a Pitch vector from a LilyPond note name
+   */
+  static fromLily(str) {
+    const regex = /^([a-g])((?:is|es)*)((?:'|,)*)$/;
+    const match = str.match(regex);
+    if (!match) {
+      throw new Error(`Invalid LilyPond note name: ${str}`);
+    }
+    const [, letter, accidentalStr, octaveStr] = match;
+    let accidental = accidentalStr.split("s").reduce((a, c) => {
+      if (c === "i") return a + 1;
+      if (c === "e") return a - 1;
+      return a;
+    }, 0);
+    const octave = 4 + octaveStr.split("").reduce((a, c) => {
+      if (c === "'") return a + 1;
+      if (c === ",") return a - 1;
+      return a;
+    }, 0);
+    let { w, h } = LETTER_COORDS["cdefgab".indexOf(letter)];
+    w += accidental;
+    h -= accidental;
+    w += 5 * octave;
+    h += 2 * octave;
+    return new _Pitch(w, h);
+  }
+  /**
    * Create a Pitch vector from a chroma value (the signed distance of a note
    * name from "C" in perfect fifths), and an octave number (in SPN numbering).
    */
@@ -102,11 +129,24 @@ var Pitch = class _Pitch {
    */
   get SPN() {
     let result = this.letter;
-    let accidental = this.accidental;
-    if (this.accidental == 2) result += "x";
-    else if (this.accidental > 0) result += "#".repeat(accidental);
-    if (this.accidental < 0) result += "b".repeat(-accidental);
+    const accidental = this.accidental;
+    if (accidental == 2) result += "x";
+    else if (accidental > 0) result += "#".repeat(accidental);
+    if (accidental < 0) result += "b".repeat(-accidental);
     result += this.octave.toString();
+    return result;
+  }
+  /**
+   * The LilyPond name of a Pitch.
+   */
+  get lily() {
+    let result = this.letter.toLowerCase();
+    const accidental = this.accidental;
+    if (accidental > 0) result += "is".repeat(accidental);
+    if (accidental < 0) result += "es".repeat(-accidental);
+    const octave = this.octave - 3;
+    if (octave > 0) result += "'".repeat(octave);
+    if (octave < 0) result += ",".repeat(-octave);
     return result;
   }
   /**

@@ -15,6 +15,10 @@ export declare class Pitch {
      */
     static fromSPN(spn: string): Pitch;
     /**
+     * Create a Pitch vector from a LilyPond note name
+     */
+    static fromLily(str: string): Pitch;
+    /**
      * Create a Pitch vector from a chroma value (the signed distance of a note
      * name from "C" in perfect fifths), and an octave number (in SPN numbering).
      */
@@ -58,6 +62,10 @@ export declare class Pitch {
      * The SPN name of a Pitch.
      */
     get SPN(): string;
+    /**
+     * The LilyPond name of a Pitch.
+     */
+    get lily(): string;
     /**
      * Returns true if two Pitch vectors are identical.
      * Note this will NOT return true for notes that are merely enharmonic in

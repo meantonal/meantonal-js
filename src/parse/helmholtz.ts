@@ -1,6 +1,10 @@
 import { LETTER_COORDS } from "../constants";
 import { Pitch } from "../pitch";
 
+/**
+ * Helper class to parse Helmholtz pitch names into Pitch vectors or vice
+ * versa.
+ */
 export class Helmholtz {
     /**
      * Create a Pitch vector from a Helmholtz note name.
@@ -37,7 +41,7 @@ export class Helmholtz {
     }
 
     /**
-     * The Helmholtz name of a Pitch.
+     * Returns the Helmholtz note name of a Pitch.
      */
     static fromPitch(p: Pitch): string {
         let result;

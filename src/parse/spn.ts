@@ -1,6 +1,10 @@
 import { LETTER_COORDS } from "../constants";
 import { Pitch } from "../pitch";
 
+/**
+ * Helper class to parse Scientific Pitch Notation to Pitch vectors or vice
+ * versa.
+ */
 export class SPN {
     /**
      * Create a Pitch vector from a Scientific Pitch Notation string.

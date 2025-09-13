@@ -544,7 +544,7 @@ var LilyPond = class {
     return new Pitch(w, h);
   }
   /**
-   * The LilyPond name of a Pitch.
+   * Returns the (absolute) LilyPond name of a Pitch.
    */
   static fromPitch(p) {
     let result = p.letter.toLowerCase();
@@ -589,7 +589,7 @@ var Helmholtz = class {
     return new Pitch(w, h);
   }
   /**
-   * The Helmholtz name of a Pitch.
+   * Returns the Helmholtz note name of a Pitch.
    */
   static fromPitch(p) {
     let result;
@@ -602,6 +602,51 @@ var Helmholtz = class {
     if (octave > 2)
       result = p.letter.toLowerCase() + accidental + "'".repeat(octave - 3);
     else result = p.letter + accidental + ",".repeat(2 - octave);
+    return result;
+  }
+};
+
+// src/parse/abc.ts
+var ABC = class {
+  /**
+   * Create a Pitch vector from an ABC note name.
+   */
+  static toPitch(str) {
+    const regex = /^([_=^]+)?([A-Ga-g])((?:'|,)*)$/;
+    const match = str.match(regex);
+    if (!match) {
+      throw new Error(`Invalid Helmholtz string: ${str}`);
+    }
+    const [, accidentalStr = "", letter, octaveStr] = match;
+    let { w, h } = LETTER_COORDS["CDEFGAB".indexOf(letter.toUpperCase())];
+    let accidental = 0;
+    const accidentalArray = accidentalStr.split("");
+    accidental += accidentalArray.filter((x) => x === "^").length;
+    accidental -= accidentalArray.filter((x) => x === "_").length;
+    w += accidental;
+    h -= accidental;
+    let octave = 0;
+    if (letter.match(/[A-G]/))
+      octave = 5 - octaveStr.split("").filter((x) => x === ",").length;
+    if (letter.match(/[a-g]/))
+      octave = 6 + octaveStr.split("").filter((x) => x === "'").length;
+    w += 5 * octave;
+    h += 2 * octave;
+    return new Pitch(w, h);
+  }
+  /**
+   * Returns the ABC note name of a Pitch vector.
+   */
+  static fromPitch(p) {
+    let result;
+    const accNumber = p.accidental;
+    let accidental = "";
+    if (accNumber > 0) accidental += "^".repeat(accNumber);
+    if (accNumber < 0) accidental += "_".repeat(-accNumber);
+    let octave = p.octave;
+    if (octave > 4)
+      result = accidental + p.letter.toLowerCase() + "'".repeat(octave - 5);
+    else result = accidental + p.letter.toUpperCase() + ",".repeat(4 - octave);
     return result;
   }
 };
@@ -697,6 +742,7 @@ _TonalContext.ACCIDENTAL_MAP = {
 };
 var TonalContext = _TonalContext;
 export {
+  ABC,
   Axis,
   Chroma,
   EDO12,

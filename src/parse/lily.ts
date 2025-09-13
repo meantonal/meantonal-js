@@ -1,6 +1,9 @@
 import { LETTER_COORDS } from "../constants";
 import { Pitch } from "../pitch";
 
+/**
+ * Helper class to parse LilyPond note names into Pitch vectors or vice versa
+ */
 export class LilyPond {
     /**
      * Create a Pitch vector from a LilyPond note name
@@ -38,7 +41,7 @@ export class LilyPond {
     }
 
     /**
-     * The LilyPond name of a Pitch.
+     * Returns the (absolute) LilyPond name of a Pitch.
      */
     static fromPitch(p: Pitch): string {
         let result = p.letter.toLowerCase();

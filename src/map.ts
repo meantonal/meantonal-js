@@ -37,8 +37,8 @@ export class MapVec {
  * 2d vectors down to 1d numbers.
  */
 export class Map1D {
-    private m0: number;
-    private m1: number;
+    m0: number;
+    m1: number;
 
     constructor(m0: number, m1: number) {
         this.m0 = m0;
@@ -53,6 +53,13 @@ export class Map1D {
         if (v instanceof MapVec) return this.m0 * v.x + this.m1 * v.y;
         return this.m0 * v.w + this.m1 * v.h;
     }
+
+    public compose(map: Map2D): Map1D {
+        return new Map1D(
+            this.m0 * map.m00 + this.m1 * map.m10,
+            this.m0 * map.m01 + this.m1 * map.m11
+        );
+    }
 }
 
 /**
@@ -60,10 +67,10 @@ export class Map1D {
  * coordinates system to another.
  */
 export class Map2D {
-    private m00: number;
-    private m01: number;
-    private m10: number;
-    private m11: number;
+    m00: number;
+    m01: number;
+    m10: number;
+    m11: number;
 
     constructor(m00: number, m01: number, m10: number, m11: number) {
         this.m00 = m00;
@@ -86,6 +93,15 @@ export class Map2D {
         return new MapVec(
             this.m00 * v.w + this.m01 * v.h,
             this.m10 * v.w + this.m11 * v.h,
+        );
+    }
+
+    public compose(map: Map2D): Map2D {
+        return new Map2D(
+            this.m00 * map.m00 + this.m01 * map.m10,
+            this.m00 * map.m01 + this.m01 * map.m11,
+            this.m10 * map.m00 + this.m11 * map.m10,
+            this.m10 * map.m01 + this.m11 * map.m11
         );
     }
 }

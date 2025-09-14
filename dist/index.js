@@ -377,7 +377,7 @@ var MapVec = class {
     return new Interval(this.x, this.y);
   }
 };
-var Map1D = class {
+var Map1D = class _Map1D {
   constructor(m0, m1) {
     this.m0 = m0;
     this.m1 = m1;
@@ -390,8 +390,14 @@ var Map1D = class {
     if (v instanceof MapVec) return this.m0 * v.x + this.m1 * v.y;
     return this.m0 * v.w + this.m1 * v.h;
   }
+  compose(map) {
+    return new _Map1D(
+      this.m0 * map.m00 + this.m1 * map.m10,
+      this.m0 * map.m01 + this.m1 * map.m11
+    );
+  }
 };
-var Map2D = class {
+var Map2D = class _Map2D {
   constructor(m00, m01, m10, m11) {
     this.m00 = m00;
     this.m01 = m01;
@@ -411,6 +417,14 @@ var Map2D = class {
     return new MapVec(
       this.m00 * v.w + this.m01 * v.h,
       this.m10 * v.w + this.m11 * v.h
+    );
+  }
+  compose(map) {
+    return new _Map2D(
+      this.m00 * map.m00 + this.m01 * map.m10,
+      this.m00 * map.m01 + this.m01 * map.m11,
+      this.m10 * map.m00 + this.m11 * map.m10,
+      this.m10 * map.m01 + this.m11 * map.m11
     );
   }
 };

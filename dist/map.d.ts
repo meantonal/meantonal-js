@@ -24,30 +24,32 @@ export declare class MapVec {
  * 2d vectors down to 1d numbers.
  */
 export declare class Map1D {
-    private m0;
-    private m1;
+    m0: number;
+    m1: number;
     constructor(m0: number, m1: number);
     /**
      * Multiplies the matrix with the passed in vector.
      * Returns a number.
      */
     map(v: MapVec | Pitch | Interval): number;
+    compose(map: Map2D): Map1D;
 }
 /**
  * Represents a 2x2 matrix. Used to effect an arbitrary basis change from one
  * coordinates system to another.
  */
 export declare class Map2D {
-    private m00;
-    private m01;
-    private m10;
-    private m11;
+    m00: number;
+    m01: number;
+    m10: number;
+    m11: number;
     constructor(m00: number, m01: number, m10: number, m11: number);
     /**
      * Multiplies the matrix with the passed in vector.
      * Returns a MapVec.
      */
     map(v: MapVec | Pitch | Interval): MapVec;
+    compose(map: Map2D): Map2D;
 }
 /**
  * Represents a map onto a given tuning system. Specified in terms of the width

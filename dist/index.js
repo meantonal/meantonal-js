@@ -74,6 +74,13 @@ var Pitch = class _Pitch {
     return Math.floor((this.w + this.h) / 7 - 1);
   }
   /**
+   * Returns the signed number of diatonic steps to reach the passed-in
+   * Pitch.
+   */
+  stepsTo(p) {
+    return p.w + p.h - (this.w + this.h);
+  }
+  /**
    * Returns true if two Pitch vectors are identical.
    * Note this will NOT return true for notes that are merely enharmonic in
    * 12TET (use the "isEnharmonic" method for that).

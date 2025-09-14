@@ -51,6 +51,11 @@ export declare class Pitch {
      */
     get octave(): number;
     /**
+     * Returns the signed number of diatonic steps to reach the passed-in
+     * Pitch.
+     */
+    stepsTo(p: Pitch): number;
+    /**
      * Returns true if two Pitch vectors are identical.
      * Note this will NOT return true for notes that are merely enharmonic in
      * 12TET (use the "isEnharmonic" method for that).

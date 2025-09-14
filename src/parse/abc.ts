@@ -36,6 +36,7 @@ export class ABC {
 
         return new Pitch(w, h);
     }
+
     /**
      * Returns the ABC note name of a Pitch vector.
      */

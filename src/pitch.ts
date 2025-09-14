@@ -93,6 +93,14 @@ export class Pitch {
     }
 
     /**
+     * Returns the signed number of diatonic steps to reach the passed-in
+     * Pitch.
+     */
+    public stepsTo(p: Pitch) {
+        return  (p.w + p.h) - (this.w + this.h);
+    }
+
+    /**
      * Returns true if two Pitch vectors are identical.
      * Note this will NOT return true for notes that are merely enharmonic in
      * 12TET (use the "isEnharmonic" method for that).

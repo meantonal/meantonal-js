@@ -79,6 +79,16 @@ test("Pitch.octave produces correct result", () => {
     expect(p.octave).toEqual(-1);
 });
 
+test("Pitch.toSteps produces correct result", () => {
+    let p = SPN.toPitch("C4");
+    let q = SPN.toPitch("F#4");
+    expect(p.stepsTo(q)).toEqual(3);
+    q = SPN.toPitch("Ab3");
+    expect(p.stepsTo(q)).toEqual(-2);
+    q = SPN.toPitch("C#4");
+    expect(p.stepsTo(q)).toEqual(0);
+});
+
 test("Pitch.equal produces correct result", () => {
     let p = SPN.toPitch("C#4");
     let q = SPN.toPitch("C#5");

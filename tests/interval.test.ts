@@ -55,6 +55,43 @@ test("Interval.chroma produces correct result", () => {
     expect(m.chroma).toEqual(10);
 });
 
+test("Interval.isDiatonic produces correct result", () => {
+    let m = Interval.fromName("P1");
+    expect(m.isDiatonic).toBeTruthy();
+    m = Interval.fromName("m2");
+    expect(m.isDiatonic).toBeTruthy();
+    m = Interval.fromName("M2");
+    expect(m.isDiatonic).toBeTruthy();
+    m = Interval.fromName("m3");
+    expect(m.isDiatonic).toBeTruthy();
+    m = Interval.fromName("M3");
+    expect(m.isDiatonic).toBeTruthy();
+    m = Interval.fromName("P4");
+    expect(m.isDiatonic).toBeTruthy();
+    m = Interval.fromName("A4");
+    expect(m.isDiatonic).toBeTruthy();
+    m = Interval.fromName("d5");
+    expect(m.isDiatonic).toBeTruthy();
+    m = Interval.fromName("P5");
+    expect(m.isDiatonic).toBeTruthy();
+    m = Interval.fromName("m6");
+    expect(m.isDiatonic).toBeTruthy();
+    m = Interval.fromName("M6");
+    expect(m.isDiatonic).toBeTruthy();
+    m = Interval.fromName("m7");
+    expect(m.isDiatonic).toBeTruthy();
+    m = Interval.fromName("M7");
+    expect(m.isDiatonic).toBeTruthy();
+    m = Interval.fromName("P8");
+    expect(m.isDiatonic).toBeTruthy();
+    m = Interval.fromName("d3");
+    expect(m.isDiatonic).toBeFalsy();
+    m = Interval.fromName("A6");
+    expect(m.isDiatonic).toBeFalsy();
+    m = Interval.fromName("A5");
+    expect(m.isDiatonic).toBeFalsy();
+});
+
 test("Interval.quality produces correct result", () => {
     let m = Interval.fromName("P1");
     expect(m.quality).toEqual(0);

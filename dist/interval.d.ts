@@ -25,6 +25,7 @@ export declare class Interval {
      * in perfect 5ths.
      */
     get chroma(): number;
+    get isDiatonic(): boolean;
     /**
      * The quality of an Interval as a signed number:
      * - 0 is perfect.

@@ -87,6 +87,10 @@ export class Interval {
         return this.w * 2 - this.h * 5;
     }
 
+    public get isDiatonic() {
+        return Math.abs(this.chroma) < 7;
+    }
+
     /**
      * The quality of an Interval as a signed number:
      * - 0 is perfect.

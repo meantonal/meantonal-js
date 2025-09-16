@@ -264,6 +264,9 @@ var Interval = class _Interval {
   get chroma() {
     return this.w * 2 - this.h * 5;
   }
+  get isDiatonic() {
+    return Math.abs(this.chroma) < 7;
+  }
   /**
    * The quality of an Interval as a signed number:
    * - 0 is perfect.

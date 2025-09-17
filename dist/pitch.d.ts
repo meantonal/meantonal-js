@@ -123,4 +123,5 @@ export declare class Axis {
     w: number;
     h: number;
     constructor(p: Pitch, q: Pitch);
+    static fromSPN(ps: string, qs: string): Axis;
 }

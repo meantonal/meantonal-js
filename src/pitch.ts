@@ -1,4 +1,5 @@
 import { Interval } from "./interval";
+import { SPN } from "./parse/spn";
 import { TonalContext } from "./tonality";
 
 /**
@@ -218,21 +219,26 @@ export class Pitch {
             while (middle.stepsTo(end) > 0) {
                 while (start.w <= middle.w - 1) {
                     while (start.h <= middle.h + 1) {
-                        if (Math.abs(start.alterationIn(context)) < 2) yield start;
+                        if (start.stepsTo(from) > 0) {
+                            start.h++;
+                            continue;
+                        }
+                        yield start;
                         start.h++;
                     }
                     start.h = floor;
                     start.w++;
                 }
+                floor = middle.h;
                 middle = nextMiAbove(middle);
-                floor = start.h;
             }
             while (start.w <= end.w) {
-                start.h = floor;
-                while (start.h <= end.h) {
-                    if (Math.abs(start.alterationIn(context)) < 2) yield start;
+                while (start.h <= middle.h + 1) {
+                    if (start.stepsTo(end) < 0) return;
+                    yield start;
                     start.h++;
                 }
+                start.h = floor;
                 start.w++;
             }
         },
@@ -250,5 +256,12 @@ export class Axis {
     constructor(p: Pitch, q: Pitch) {
         this.w = p.w + q.w;
         this.h = p.h + q.h;
+    }
+
+    static fromSPN(ps: string, qs: string) {
+        return new Axis(
+            SPN.toPitch(ps),
+            SPN.toPitch(qs)
+        )
     }
 }

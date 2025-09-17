@@ -190,30 +190,41 @@ _Pitch.range = {
     while (middle.stepsTo(end) > 0) {
       while (start.w <= middle.w - 1) {
         while (start.h <= middle.h + 1) {
-          if (Math.abs(start.alterationIn(context)) < 2) yield start;
+          if (start.stepsTo(from) > 0) {
+            start.h++;
+            continue;
+          }
+          yield start;
           start.h++;
         }
         start.h = floor;
         start.w++;
       }
+      floor = middle.h;
       middle = nextMiAbove(middle);
-      floor = start.h;
     }
     while (start.w <= end.w) {
-      start.h = floor;
-      while (start.h <= end.h) {
-        if (Math.abs(start.alterationIn(context)) < 2) yield start;
+      while (start.h <= middle.h + 1) {
+        if (start.stepsTo(end) < 0) return;
+        yield start;
         start.h++;
       }
+      start.h = floor;
       start.w++;
     }
   }
 };
 var Pitch = _Pitch;
-var Axis = class {
+var Axis = class _Axis {
   constructor(p, q) {
     this.w = p.w + q.w;
     this.h = p.h + q.h;
+  }
+  static fromSPN(ps, qs) {
+    return new _Axis(
+      SPN.toPitch(ps),
+      SPN.toPitch(qs)
+    );
   }
 };
 

@@ -202,7 +202,7 @@ var SPN = class {
 };
 
 // src/interval.ts
-var Interval = class _Interval {
+var _Interval = class _Interval {
   constructor(w, h) {
     this.w = w;
     this.h = h;
@@ -369,6 +369,45 @@ var Interval = class _Interval {
     return new _Interval(this.w - octave * 5, this.h - octave * 2);
   }
 };
+_Interval.range = {
+  *diatonic(start = new _Interval(0, 0), end = new _Interval(5, 2)) {
+    const octave = new _Interval(5, 2);
+    let mid = start.add(octave);
+    let floor = start.h;
+    while (end.subtract(mid).stepspan > 0) {
+      while (start.w <= mid.w) {
+        start.h = floor;
+        while (start.h <= mid.h) {
+          if (Math.abs(start.chroma) <= 6) yield start;
+          start.h++;
+        }
+        start.w++;
+      }
+      mid = mid.add(octave);
+      floor = start.h;
+    }
+    while (start.w <= end.w) {
+      start.h = floor;
+      while (start.h <= end.h) {
+        if (Math.abs(start.chroma) <= 6) yield start;
+        start.h++;
+      }
+      start.w++;
+    }
+  },
+  *melodic() {
+    let m = new _Interval(0, 0);
+    while (m.w <= 5) {
+      while (m.h <= 2) {
+        if (Math.abs(m.chroma) <= 5 && m.stepspan !== 5) yield m;
+        m.h++;
+      }
+      m.h = 0;
+      m.w++;
+    }
+  }
+};
+var Interval = _Interval;
 
 // src/map.ts
 var MapVec = class {

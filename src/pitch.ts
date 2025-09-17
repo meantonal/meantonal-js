@@ -97,7 +97,7 @@ export class Pitch {
      * Pitch.
      */
     public stepsTo(p: Pitch) {
-        return  (p.w + p.h) - (this.w + this.h);
+        return (p.w + p.h) - (this.w + this.h);
     }
 
     /**
@@ -180,6 +180,62 @@ export class Pitch {
      */
     public transposeDiatonic(steps: number, context: TonalContext) {
         return this.transposeReal(new Interval(steps, 0)).snapTo(context);
+    }
+
+    static range = {
+        *diatonic(from: Pitch, to: Pitch, context: TonalContext) {
+            let m = new Pitch(from.w, from.h);
+            yield m.snapTo(context);
+            while (m.stepsTo(to) > 0) {
+                m = m.transposeDiatonic(1, context);
+                yield m;
+            }
+        },
+        *chromatic(from: Pitch, to: Pitch, context: TonalContext) {
+            const nearestMiBelow = (p: Pitch) => {
+                const chroma = p.chroma;
+                const hardMi = 6 - context.chromaOffset;
+                const naturalMi = 5 - context.chromaOffset;
+                const distanceToHardMi = ((chroma - hardMi) * 3 % 7 - 7) % 7;
+                const distanceToNaturalMi = ((chroma - naturalMi) * 3 % 7 - 7) % 7;
+                let nearestMi = Math.max(distanceToHardMi, distanceToNaturalMi);
+                return p.transposeDiatonic(nearestMi, context);
+            }
+            const nextMiAbove = (p: Pitch) => {
+                const chroma = p.chroma;
+                const hardMi = 6 - context.chromaOffset;
+                const naturalMi = 5 - context.chromaOffset;
+                const distanceToHardMi = ((chroma - hardMi) * 3 % 7 + 7) % 7;
+                const distanceToNaturalMi = ((chroma - naturalMi) * 3 % 7 + 7) % 7;
+                let nextMi = Math.max(distanceToHardMi, distanceToNaturalMi);
+                return p.transposeDiatonic(nextMi, context);
+            }
+            let start = new Pitch(from.w, from.h);
+            let miBelow = nearestMiBelow(start)
+            let floor = miBelow.h;
+            let middle = nextMiAbove(miBelow);
+            const end = to;
+            while (middle.stepsTo(end) > 0) {
+                while (start.w <= middle.w - 1) {
+                    while (start.h <= middle.h + 1) {
+                        if (Math.abs(start.alterationIn(context)) < 2) yield start;
+                        start.h++;
+                    }
+                    start.h = floor;
+                    start.w++;
+                }
+                middle = nextMiAbove(middle);
+                floor = start.h;
+            }
+            while (start.w <= end.w) {
+                start.h = floor;
+                while (start.h <= end.h) {
+                    if (Math.abs(start.alterationIn(context)) < 2) yield start;
+                    start.h++;
+                }
+                start.w++;
+            }
+        },
     }
 }
 

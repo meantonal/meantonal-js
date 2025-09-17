@@ -1,5 +1,5 @@
 // src/pitch.ts
-var Pitch = class _Pitch {
+var _Pitch = class _Pitch {
   // half steps from C-1
   constructor(w, h) {
     this.w = w;
@@ -154,6 +154,62 @@ var Pitch = class _Pitch {
     return this.transposeReal(new Interval(steps, 0)).snapTo(context);
   }
 };
+_Pitch.range = {
+  *diatonic(from, to, context) {
+    let m = new _Pitch(from.w, from.h);
+    yield m.snapTo(context);
+    while (m.stepsTo(to) > 0) {
+      m = m.transposeDiatonic(1, context);
+      yield m;
+    }
+  },
+  *chromatic(from, to, context) {
+    const nearestMiBelow = (p) => {
+      const chroma = p.chroma;
+      const hardMi = 6 - context.chromaOffset;
+      const naturalMi = 5 - context.chromaOffset;
+      const distanceToHardMi = ((chroma - hardMi) * 3 % 7 - 7) % 7;
+      const distanceToNaturalMi = ((chroma - naturalMi) * 3 % 7 - 7) % 7;
+      let nearestMi = Math.max(distanceToHardMi, distanceToNaturalMi);
+      return p.transposeDiatonic(nearestMi, context);
+    };
+    const nextMiAbove = (p) => {
+      const chroma = p.chroma;
+      const hardMi = 6 - context.chromaOffset;
+      const naturalMi = 5 - context.chromaOffset;
+      const distanceToHardMi = ((chroma - hardMi) * 3 % 7 + 7) % 7;
+      const distanceToNaturalMi = ((chroma - naturalMi) * 3 % 7 + 7) % 7;
+      let nextMi = Math.max(distanceToHardMi, distanceToNaturalMi);
+      return p.transposeDiatonic(nextMi, context);
+    };
+    let start = new _Pitch(from.w, from.h);
+    let miBelow = nearestMiBelow(start);
+    let floor = miBelow.h;
+    let middle = nextMiAbove(miBelow);
+    const end = to;
+    while (middle.stepsTo(end) > 0) {
+      while (start.w <= middle.w - 1) {
+        while (start.h <= middle.h + 1) {
+          if (Math.abs(start.alterationIn(context)) < 2) yield start;
+          start.h++;
+        }
+        start.h = floor;
+        start.w++;
+      }
+      middle = nextMiAbove(middle);
+      floor = start.h;
+    }
+    while (start.w <= end.w) {
+      start.h = floor;
+      while (start.h <= end.h) {
+        if (Math.abs(start.alterationIn(context)) < 2) yield start;
+        start.h++;
+      }
+      start.w++;
+    }
+  }
+};
+var Pitch = _Pitch;
 var Axis = class {
   constructor(p, q) {
     this.w = p.w + q.w;
@@ -378,7 +434,7 @@ _Interval.range = {
       while (start.w <= mid.w) {
         start.h = floor;
         while (start.h <= mid.h) {
-          if (Math.abs(start.chroma) <= 6) yield start;
+          if (start.isDiatonic) yield start;
           start.h++;
         }
         start.w++;
@@ -389,7 +445,7 @@ _Interval.range = {
     while (start.w <= end.w) {
       start.h = floor;
       while (start.h <= end.h) {
-        if (Math.abs(start.chroma) <= 6) yield start;
+        if (start.isDiatonic) yield start;
         start.h++;
       }
       start.w++;
@@ -399,7 +455,7 @@ _Interval.range = {
     let m = new _Interval(0, 0);
     while (m.w <= 5) {
       while (m.h <= 2) {
-        if (Math.abs(m.chroma) <= 5 && m.stepspan !== 5) yield m;
+        if (Math.abs(m.chroma) < 6 && m.stepspan !== 6) yield m;
         m.h++;
       }
       m.h = 0;

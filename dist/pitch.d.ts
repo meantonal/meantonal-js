@@ -110,6 +110,10 @@ export declare class Pitch {
      * - Measured in steps, such that 0 is a unison.
      */
     transposeDiatonic(steps: number, context: TonalContext): Pitch;
+    static range: {
+        diatonic(from: Pitch, to: Pitch, context: TonalContext): Generator<Pitch, void, unknown>;
+        chromatic(from: Pitch, to: Pitch, context: TonalContext): Generator<Pitch, void, unknown>;
+    };
 }
 /**
  * The Axis class is used to invert pitches about a fixed point.

@@ -211,11 +211,11 @@ export class Interval {
             const octave = new Interval(5, 2);
             let mid = start.add(octave);
             let floor = start.h;
-            while(end.subtract(mid).stepspan > 0) {
+            while (end.subtract(mid).stepspan > 0) {
                 while (start.w <= mid.w) {
                     start.h = floor;
                     while (start.h <= mid.h) {
-                        if (Math.abs(start.chroma) <= 6) yield start;
+                        if (start.isDiatonic) yield start;
                         start.h++;
                     }
                     start.w++;
@@ -226,7 +226,7 @@ export class Interval {
             while (start.w <= end.w) {
                 start.h = floor;
                 while (start.h <= end.h) {
-                    if (Math.abs(start.chroma) <= 6) yield start;
+                    if (start.isDiatonic) yield start;
                     start.h++;
                 }
                 start.w++;
@@ -236,7 +236,7 @@ export class Interval {
             let m = new Interval(0, 0);
             while (m.w <= 5) {
                 while (m.h <= 2) {
-                    if (Math.abs(m.chroma) <= 5 && m.stepspan !== 5) yield m;
+                    if (Math.abs(m.chroma) < 6 && m.stepspan !== 6) yield m;
                     m.h++;
                 }
                 m.h = 0;

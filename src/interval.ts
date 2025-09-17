@@ -99,13 +99,15 @@ export class Interval {
      * etc. for arbitrarily remote Interval qualities.
      */
     public get quality() {
-        if (Math.abs(this.chroma) <= 1) return 0;
-        if (this.chroma > 0 && this.chroma <= 5)
-            return Math.floor((this.chroma + 5) / 7);
-        if (this.chroma < 0 && this.chroma >= -5)
-            return Math.ceil((this.chroma - 5) / 7);
-        if (this.chroma > 5) return Math.floor((this.chroma + 8) / 7);
-        return Math.floor((this.chroma - 2) / 7);
+        const sign = this.stepspan < 0 ? -1 : 1;
+        const chroma = this.chroma
+        if (Math.abs(chroma) <= 1) return 0;
+        if (chroma > 0 && chroma <= 5)
+            return sign * Math.floor((chroma + 5) / 7);
+        if (chroma < 0 && chroma >= -5)
+            return sign * Math.ceil((chroma - 5) / 7);
+        if (chroma > 5) return sign * Math.floor((chroma + 8) / 7);
+        return sign * Math.floor((chroma - 2) / 7);
     }
 
     /**
@@ -136,13 +138,15 @@ export class Interval {
      */
     public get name() {
         let result = "";
+        const stepspan = this.stepspan;
+        if (this.stepspan < 0) result += "-"
         const quality = this.quality;
         if (quality > 1) result += "A".repeat(quality - 1);
         if (quality === 1) result += "M";
         if (quality === 0) result += "P";
         if (quality === -1) result += "m";
         if (quality < -1) result += "d".repeat(-quality - 1);
-        result += (this.stepspan + 1).toString();
+        result += (Math.abs(stepspan) + 1).toString();
         return result;
     }
 

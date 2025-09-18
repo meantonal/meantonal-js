@@ -112,8 +112,8 @@ var _Pitch = class _Pitch {
   }
   /**
    * Invert a Pitch vector about the passed in axis.
-   * An Axis is created from two Pitches, either directly or via
-   * Axis.fromSPN() using two SPN strings.
+   * A MirrorAxis is created from two Pitches, either directly or via
+   * MirrorAxis.fromSPN() using two SPN strings.
    * Pitch.invert returns the inverted Pitch as a new vector.
    * It does not modify the original Pitch.
    */
@@ -160,7 +160,7 @@ _Pitch.range = {
     yield m.snapTo(context);
     while (m.stepsTo(to) > 0) {
       m = m.transposeDiatonic(1, context);
-      yield m;
+      yield new _Pitch(m.w, m.h);
     }
   },
   *chromatic(from, to, context) {
@@ -176,7 +176,7 @@ _Pitch.range = {
             current.h++;
             continue;
           }
-          yield current;
+          yield new _Pitch(current.w, current.h);
           current.h++;
         }
         current.h = floor;
@@ -188,7 +188,7 @@ _Pitch.range = {
     while (current.w <= end.w) {
       while (current.h <= middle.h + 1) {
         if (current.stepsTo(end) < 0) return;
-        yield current;
+        yield new _Pitch(current.w, current.h);
         current.h++;
       }
       current.h = floor;
@@ -197,13 +197,13 @@ _Pitch.range = {
   }
 };
 var Pitch = _Pitch;
-var Axis = class _Axis {
+var MirrorAxis = class _MirrorAxis {
   constructor(p, q) {
     this.w = p.w + q.w;
     this.h = p.h + q.h;
   }
   static fromSPN(ps, qs) {
-    return new _Axis(
+    return new _MirrorAxis(
       SPN.toPitch(ps),
       SPN.toPitch(qs)
     );
@@ -429,8 +429,8 @@ _Interval.range = {
     while (end.subtract(middle).stepspan > 0) {
       while (current.w <= middle.w) {
         current.h = floor;
-        while (current.h <= middle.h) {
-          if (current.isDiatonic) yield current;
+        while (current.h <= middle.h + 1) {
+          if (current.isDiatonic) yield new _Interval(current.w, current.h);
           current.h++;
         }
         current.w++;
@@ -440,10 +440,10 @@ _Interval.range = {
     }
     while (current.w <= middle.w) {
       current.h = floor;
-      while (current.h <= middle.h) {
-        if (end.subtract(current).stepspan > 0) current.h++;
+      while (current.h <= middle.h + 1) {
+        if (end.subtract(current).stepspan < 0) current.h++;
         if (current.w === end.w && current.h > end.h) return;
-        if (current.isDiatonic) yield current;
+        if (current.isDiatonic) yield new _Interval(current.w, current.h);
         current.h++;
       }
       current.w++;
@@ -453,7 +453,7 @@ _Interval.range = {
     let m = new _Interval(0, 0);
     while (m.w <= 5) {
       while (m.h <= 2) {
-        if (Math.abs(m.chroma) < 6 && m.stepspan !== 6) yield m;
+        if (Math.abs(m.chroma) < 6 && m.stepspan !== 6) yield new _Interval(m.w, m.h);
         m.h++;
       }
       m.h = 0;
@@ -882,7 +882,6 @@ _TonalContext.ACCIDENTAL_MAP = {
 var TonalContext = _TonalContext;
 export {
   ABC,
-  Axis,
   Chroma,
   EDO12,
   EDO17,
@@ -904,6 +903,7 @@ export {
   Map1D,
   Map2D,
   MapVec,
+  MirrorAxis,
   Pitch,
   SPN,
   TonalContext,

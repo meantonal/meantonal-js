@@ -5,6 +5,6 @@ export { SPN } from "./parse/spn";
 export { LilyPond } from "./parse/lily";
 export { Helmholtz } from "./parse/helmholtz";
 export { ABC } from "./parse/abc";
-export { Pitch, Axis } from "./pitch";
+export { Pitch, MirrorAxis } from "./pitch";
 export { Interval } from "./interval";
 export { TonalContext } from "./tonality";

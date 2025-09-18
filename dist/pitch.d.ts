@@ -80,11 +80,11 @@ export declare class Pitch {
     /**
      * Invert a Pitch vector about the passed in axis.
      * A MirrorAxis is created from two Pitches, either directly or via
-     * Axis.fromSPN() using two SPN strings.
+     * MirrorAxis.fromSPN() using two SPN strings.
      * Pitch.invert returns the inverted Pitch as a new vector.
      * It does not modify the original Pitch.
      */
-    invert(axis: Axis): Pitch;
+    invert(axis: MirrorAxis): Pitch;
     /**
      * Returns the scale degree number represented by a Pitch in the passed-in
      * TonalContext.
@@ -116,12 +116,12 @@ export declare class Pitch {
     };
 }
 /**
- * The Axis class is used to invert pitches about a fixed point.
+ * The MirrorAxis class is used to invert pitches about a fixed point.
  * It can be defined by two Pitch vectors that will invert to each other.
  */
-export declare class Axis {
+export declare class MirrorAxis {
     w: number;
     h: number;
     constructor(p: Pitch, q: Pitch);
-    static fromSPN(ps: string, qs: string): Axis;
+    static fromSPN(ps: string, qs: string): MirrorAxis;
 }

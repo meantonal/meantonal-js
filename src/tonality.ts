@@ -19,7 +19,7 @@ export class TonalContext {
         chroma: number;
     };
     mode: number;
-    chromaOffset: number;
+    private chromaOffset: number;
 
     constructor(chroma: number, mode: number) {
         this.tonic = {

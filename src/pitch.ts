@@ -137,12 +137,12 @@ export class Pitch {
 
     /**
      * Invert a Pitch vector about the passed in axis.
-     * An Axis is created from two Pitches, either directly or via
-     * Axis.fromSPN() using two SPN strings.
+     * A MirrorAxis is created from two Pitches, either directly or via
+     * MirrorAxis.fromSPN() using two SPN strings.
      * Pitch.invert returns the inverted Pitch as a new vector.
      * It does not modify the original Pitch.
      */
-    public invert(axis: Axis) {
+    public invert(axis: MirrorAxis) {
         return new Pitch(axis.w - this.w, axis.h - this.h);
     }
 
@@ -228,10 +228,10 @@ export class Pitch {
 }
 
 /**
- * The Axis class is used to invert pitches about a fixed point.
+ * The MirrorAxis class is used to invert pitches about a fixed point.
  * It can be defined by two Pitch vectors that will invert to each other.
  */
-export class Axis {
+export class MirrorAxis {
     w: number;
     h: number;
 
@@ -241,7 +241,7 @@ export class Axis {
     }
 
     static fromSPN(ps: string, qs: string) {
-        return new Axis(
+        return new MirrorAxis(
             SPN.toPitch(ps),
             SPN.toPitch(qs)
         )

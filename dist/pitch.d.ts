@@ -79,7 +79,7 @@ export declare class Pitch {
     transposeReal(m: Interval): Pitch;
     /**
      * Invert a Pitch vector about the passed in axis.
-     * An Axis is created from two Pitches, either directly or via
+     * A MirrorAxis is created from two Pitches, either directly or via
      * Axis.fromSPN() using two SPN strings.
      * Pitch.invert returns the inverted Pitch as a new vector.
      * It does not modify the original Pitch.

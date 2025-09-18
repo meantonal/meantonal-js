@@ -1,4 +1,4 @@
-import { Pitch, Axis, SPN, LilyPond, Helmholtz, TonalContext } from "../src";
+import { Pitch, MirrorAxis, SPN, LilyPond, Helmholtz, TonalContext } from "../src";
 import { Interval } from "../src";
 
 test("Pitch.fromChroma creates correct Pitch vector", () => {
@@ -125,7 +125,7 @@ test("Pitch.transposeReal produces correct result", () => {
 test("Pitch.invert produces correct result", () => {
     let p = SPN.toPitch("E4");
     let q = SPN.toPitch("Eb4");
-    const axis = new Axis(SPN.toPitch("C4"), SPN.toPitch("G4"));
+    const axis = MirrorAxis.fromSPN("C4", "G4");
     expect(p.invert(axis).isEqual(q)).toBeTruthy();
     p = SPN.toPitch("D4");
     q = SPN.toPitch("F4");

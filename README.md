@@ -30,7 +30,7 @@ npm install meantonal
 You're now ready to import and use Meantonal's classes.
 
 ```ts
-import { SPN, Helmholtz, Interval, TonalContext, Axis } from "meantonal";
+import { SPN, Helmholtz, Interval, TonalContext, MirrorAxis } from "meantonal";
 
 let p = SPN.toPitch("C4");
 let q = Helmholtz.toPitch("e'");
@@ -44,7 +44,7 @@ let context = TonalContext.fromStrings("Eb", "major");
 
 q = q.snapDiatonic(context); // q has now snapped to Eb4
 
-let axis = Axis(SPN.toPitch("D4"), SPN.toPitch("A4"));
+let axis = MirrorAxis.fromSPN("D4", "A4");
 
 q = q.invert(axis); // q is now G#4
 ```

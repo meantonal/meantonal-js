@@ -50,4 +50,6 @@ export declare class TonalContext {
      * - e.g. in D major, F4 would "snap" to F#4.
      */
     snapDiatonic(p: Pitch): Pitch;
+    nearestMiBelow(p: Pitch): Pitch;
+    nextMiAbove(p: Pitch): Pitch;
 }

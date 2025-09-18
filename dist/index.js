@@ -164,53 +164,35 @@ _Pitch.range = {
     }
   },
   *chromatic(from, to, context) {
-    const nearestMiBelow = (p) => {
-      const chroma = p.chroma;
-      const hardMi = 6 - context.chromaOffset;
-      const naturalMi = 5 - context.chromaOffset;
-      const distanceToHardMi = ((chroma - hardMi) * 3 % 7 - 7) % 7;
-      const distanceToNaturalMi = ((chroma - naturalMi) * 3 % 7 - 7) % 7;
-      let nearestMi = Math.max(distanceToHardMi, distanceToNaturalMi);
-      return p.transposeDiatonic(nearestMi, context);
-    };
-    const nextMiAbove = (p) => {
-      const chroma = p.chroma;
-      const hardMi = 6 - context.chromaOffset;
-      const naturalMi = 5 - context.chromaOffset;
-      const distanceToHardMi = ((chroma - hardMi) * 3 % 7 + 7) % 7;
-      const distanceToNaturalMi = ((chroma - naturalMi) * 3 % 7 + 7) % 7;
-      let nextMi = Math.max(distanceToHardMi, distanceToNaturalMi);
-      return p.transposeDiatonic(nextMi, context);
-    };
-    let start = new _Pitch(from.w, from.h);
-    let miBelow = nearestMiBelow(start);
+    let current = new _Pitch(from.w, from.h);
+    let miBelow = context.nearestMiBelow(current);
     let floor = miBelow.h;
-    let middle = nextMiAbove(miBelow);
+    let middle = context.nextMiAbove(miBelow);
     const end = to;
     while (middle.stepsTo(end) > 0) {
-      while (start.w <= middle.w - 1) {
-        while (start.h <= middle.h + 1) {
-          if (start.stepsTo(from) > 0) {
-            start.h++;
+      while (current.w <= middle.w - 1) {
+        while (current.h <= middle.h + 1) {
+          if (current.stepsTo(from) > 0) {
+            current.h++;
             continue;
           }
-          yield start;
-          start.h++;
+          yield current;
+          current.h++;
         }
-        start.h = floor;
-        start.w++;
+        current.h = floor;
+        current.w++;
       }
       floor = middle.h;
-      middle = nextMiAbove(middle);
+      middle = context.nextMiAbove(middle);
     }
-    while (start.w <= end.w) {
-      while (start.h <= middle.h + 1) {
-        if (start.stepsTo(end) < 0) return;
-        yield start;
-        start.h++;
+    while (current.w <= end.w) {
+      while (current.h <= middle.h + 1) {
+        if (current.stepsTo(end) < 0) return;
+        yield current;
+        current.h++;
       }
-      start.h = floor;
-      start.w++;
+      current.h = floor;
+      current.w++;
     }
   }
 };
@@ -437,29 +419,34 @@ var _Interval = class _Interval {
   }
 };
 _Interval.range = {
-  *diatonic(start = new _Interval(0, 0), end = new _Interval(5, 2)) {
+  *diatonic(from = new _Interval(0, 0), to = new _Interval(5, 2)) {
     const octave = new _Interval(5, 2);
-    let mid = start.add(octave);
-    let floor = start.h;
-    while (end.subtract(mid).stepspan > 0) {
-      while (start.w <= mid.w) {
-        start.h = floor;
-        while (start.h <= mid.h) {
-          if (start.isDiatonic) yield start;
-          start.h++;
+    let current = new _Interval(from.w, from.h);
+    let middle = current.add(octave);
+    const offset = current.quality < 0 ? -1 : 0;
+    let floor = current.h + offset;
+    const end = to;
+    while (end.subtract(middle).stepspan > 0) {
+      while (current.w <= middle.w) {
+        current.h = floor;
+        while (current.h <= middle.h) {
+          if (current.isDiatonic) yield current;
+          current.h++;
         }
-        start.w++;
+        current.w++;
       }
-      mid = mid.add(octave);
-      floor = start.h;
+      middle = middle.add(octave);
+      floor = current.h + offset;
     }
-    while (start.w <= end.w) {
-      start.h = floor;
-      while (start.h <= end.h) {
-        if (start.isDiatonic) yield start;
-        start.h++;
+    while (current.w <= middle.w) {
+      current.h = floor;
+      while (current.h <= middle.h) {
+        if (end.subtract(current).stepspan > 0) current.h++;
+        if (current.w === end.w && current.h > end.h) return;
+        if (current.isDiatonic) yield current;
+        current.h++;
       }
-      start.w++;
+      current.w++;
     }
   },
   *melodic() {
@@ -866,6 +853,24 @@ var _TonalContext = class _TonalContext {
       result.h--;
     }
     return result;
+  }
+  nearestMiBelow(p) {
+    const chroma = p.chroma;
+    const hardMi = 6 - this.chromaOffset;
+    const naturalMi = hardMi - 1;
+    const distanceToHardMi = ((chroma - hardMi) * 3 % 7 - 7) % 7;
+    const distanceToNaturalMi = ((chroma - naturalMi) * 3 % 7 - 7) % 7;
+    let nearestMi = Math.max(distanceToHardMi, distanceToNaturalMi);
+    return p.transposeDiatonic(nearestMi, this);
+  }
+  nextMiAbove(p) {
+    const chroma = p.chroma;
+    const hardMi = 6 - this.chromaOffset;
+    const naturalMi = hardMi - 1;
+    const distanceToHardMi = ((chroma - hardMi) * 3 % 7 + 7) % 7;
+    const distanceToNaturalMi = ((chroma - naturalMi) * 3 % 7 + 7) % 7;
+    let nextMi = Math.max(distanceToHardMi, distanceToNaturalMi);
+    return p.transposeDiatonic(nextMi, this);
   }
 };
 _TonalContext.ACCIDENTAL_MAP = {

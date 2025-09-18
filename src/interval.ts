@@ -205,38 +205,46 @@ export class Interval {
 
     static range = {
         *diatonic(
-            start: Interval = new Interval(0, 0),
-            end: Interval = new Interval(5, 2)
+            from: Interval = new Interval(0, 0),
+            to: Interval = new Interval(5, 2)
         ) {
             const octave = new Interval(5, 2);
-            let mid = start.add(octave);
-            let floor = start.h;
-            while (end.subtract(mid).stepspan > 0) {
-                while (start.w <= mid.w) {
-                    start.h = floor;
-                    while (start.h <= mid.h) {
-                        if (start.isDiatonic) yield start;
-                        start.h++;
+
+            let current = new Interval(from.w, from.h);
+            let middle = current.add(octave);
+
+            const offset = current.quality < 0 ? -1 : 0;
+            let floor = current.h + offset;
+
+            const end = to;
+            while (end.subtract(middle).stepspan > 0) {
+                while (current.w <= middle.w) {
+                    current.h = floor;
+                    while (current.h <= middle.h + 1) {
+                        if (current.isDiatonic) yield new Interval(current.w, current.h);
+                        current.h++;
                     }
-                    start.w++;
+                    current.w++;
                 }
-                mid = mid.add(octave);
-                floor = start.h;
+                middle = middle.add(octave);
+                floor = current.h + offset;
             }
-            while (start.w <= end.w) {
-                start.h = floor;
-                while (start.h <= end.h) {
-                    if (start.isDiatonic) yield start;
-                    start.h++;
+            while (current.w <= middle.w) {
+                current.h = floor;
+                while (current.h <= middle.h + 1) {
+                    if (end.subtract(current).stepspan < 0) current.h++;
+                    if (current.w === end.w && current.h > end.h) return;
+                    if (current.isDiatonic) yield new Interval(current.w, current.h);
+                    current.h++;
                 }
-                start.w++;
+                current.w++;
             }
         },
         *melodic() {
             let m = new Interval(0, 0);
             while (m.w <= 5) {
                 while (m.h <= 2) {
-                    if (Math.abs(m.chroma) < 6 && m.stepspan !== 6) yield m;
+                    if (Math.abs(m.chroma) < 6 && m.stepspan !== 6) yield new Interval(m.w, m.h);
                     m.h++;
                 }
                 m.h = 0;

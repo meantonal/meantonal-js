@@ -118,4 +118,24 @@ export class TonalContext {
 
         return result;
     }
+
+    public nearestMiBelow(p: Pitch) {
+        const chroma = p.chroma;
+        const hardMi = 6 - this.chromaOffset;
+        const naturalMi = hardMi - 1;
+        const distanceToHardMi = ((chroma - hardMi) * 3 % 7 - 7) % 7;
+        const distanceToNaturalMi = ((chroma - naturalMi) * 3 % 7 - 7) % 7;
+        let nearestMi = Math.max(distanceToHardMi, distanceToNaturalMi);
+        return p.transposeDiatonic(nearestMi, this);
+    }
+
+    public nextMiAbove(p: Pitch) {
+        const chroma = p.chroma;
+        const hardMi = 6 - this.chromaOffset;
+        const naturalMi = hardMi - 1;
+        const distanceToHardMi = ((chroma - hardMi) * 3 % 7 + 7) % 7;
+        const distanceToNaturalMi = ((chroma - naturalMi) * 3 % 7 + 7) % 7;
+        let nextMi = Math.max(distanceToHardMi, distanceToNaturalMi);
+        return p.transposeDiatonic(nextMi, this);
+    }
 }

@@ -79,7 +79,7 @@ export declare class Interval {
      */
     get simple(): Interval;
     static range: {
-        diatonic(start?: Interval, end?: Interval): Generator<Interval, void, unknown>;
+        diatonic(from?: Interval, to?: Interval): Generator<Interval, void, unknown>;
         melodic(): Generator<Interval, void, unknown>;
     };
 }

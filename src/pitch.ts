@@ -189,57 +189,39 @@ export class Pitch {
             yield m.snapTo(context);
             while (m.stepsTo(to) > 0) {
                 m = m.transposeDiatonic(1, context);
-                yield m;
+                yield new Pitch(m.w, m.h);
             }
         },
         *chromatic(from: Pitch, to: Pitch, context: TonalContext) {
-            const nearestMiBelow = (p: Pitch) => {
-                const chroma = p.chroma;
-                const hardMi = 6 - context.chromaOffset;
-                const naturalMi = 5 - context.chromaOffset;
-                const distanceToHardMi = ((chroma - hardMi) * 3 % 7 - 7) % 7;
-                const distanceToNaturalMi = ((chroma - naturalMi) * 3 % 7 - 7) % 7;
-                let nearestMi = Math.max(distanceToHardMi, distanceToNaturalMi);
-                return p.transposeDiatonic(nearestMi, context);
-            }
-            const nextMiAbove = (p: Pitch) => {
-                const chroma = p.chroma;
-                const hardMi = 6 - context.chromaOffset;
-                const naturalMi = 5 - context.chromaOffset;
-                const distanceToHardMi = ((chroma - hardMi) * 3 % 7 + 7) % 7;
-                const distanceToNaturalMi = ((chroma - naturalMi) * 3 % 7 + 7) % 7;
-                let nextMi = Math.max(distanceToHardMi, distanceToNaturalMi);
-                return p.transposeDiatonic(nextMi, context);
-            }
-            let start = new Pitch(from.w, from.h);
-            let miBelow = nearestMiBelow(start)
+            let current = new Pitch(from.w, from.h);
+            let miBelow = context.nearestMiBelow(current)
             let floor = miBelow.h;
-            let middle = nextMiAbove(miBelow);
+            let middle = context.nextMiAbove(miBelow);
             const end = to;
             while (middle.stepsTo(end) > 0) {
-                while (start.w <= middle.w - 1) {
-                    while (start.h <= middle.h + 1) {
-                        if (start.stepsTo(from) > 0) {
-                            start.h++;
+                while (current.w <= middle.w - 1) {
+                    while (current.h <= middle.h + 1) {
+                        if (current.stepsTo(from) > 0) {
+                            current.h++;
                             continue;
                         }
-                        yield start;
-                        start.h++;
+                        yield new Pitch(current.w, current.h);
+                        current.h++;
                     }
-                    start.h = floor;
-                    start.w++;
+                    current.h = floor;
+                    current.w++;
                 }
                 floor = middle.h;
-                middle = nextMiAbove(middle);
+                middle = context.nextMiAbove(middle);
             }
-            while (start.w <= end.w) {
-                while (start.h <= middle.h + 1) {
-                    if (start.stepsTo(end) < 0) return;
-                    yield start;
-                    start.h++;
+            while (current.w <= end.w) {
+                while (current.h <= middle.h + 1) {
+                    if (current.stepsTo(end) < 0) return;
+                    yield new Pitch(current.w, current.h);
+                    current.h++;
                 }
-                start.h = floor;
-                start.w++;
+                current.h = floor;
+                current.w++;
             }
         },
     }

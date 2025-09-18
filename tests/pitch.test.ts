@@ -1,4 +1,4 @@
-import { Pitch, Axis, SPN, LilyPond, Helmholtz } from "../src";
+import { Pitch, Axis, SPN, LilyPond, Helmholtz, TonalContext } from "../src";
 import { Interval } from "../src";
 
 test("Pitch.fromChroma creates correct Pitch vector", () => {
@@ -130,4 +130,58 @@ test("Pitch.invert produces correct result", () => {
     p = SPN.toPitch("D4");
     q = SPN.toPitch("F4");
     expect(p.invert(axis).isEqual(q)).toBeTruthy();
+});
+
+test("Pitch.range.diatonic produces correct range", () => {
+    let from = SPN.toPitch("C4");
+    let to = SPN.toPitch("C5");
+    let context = TonalContext.fromStrings("C", "major");
+    let range = Array.from(Pitch.range.diatonic(from, to, context)).map(p => SPN.fromPitch(p));
+    expect(range).toContain("C4");
+    expect(range).toContain("D4");
+    expect(range).toContain("E4");
+    expect(range).toContain("F4");
+    expect(range).toContain("G4");
+    expect(range).toContain("A4");
+    expect(range).toContain("B4");
+    expect(range).toContain("C5");
+    expect(range).not.toContain("C#4");
+    expect(range).not.toContain("B3");
+    expect(range).not.toContain("C#5");
+    expect(range).not.toContain("Db5");
+});
+
+test("Pitch.range.chromatic produces correct range", () => {
+    let from = SPN.toPitch("C4");
+    let to = SPN.toPitch("E5");
+    let context = TonalContext.fromStrings("C", "major");
+    let range = Array.from(Pitch.range.chromatic(from, to, context)).map(p => SPN.fromPitch(p));
+    expect(range).toContain("C4");
+    expect(range).toContain("C#4");
+    expect(range).toContain("Db4");
+    expect(range).toContain("D4");
+    expect(range).toContain("D#4");
+    expect(range).toContain("Eb4");
+    expect(range).toContain("E4");
+    expect(range).toContain("F4");
+    expect(range).toContain("F#4");
+    expect(range).toContain("Gb4");
+    expect(range).toContain("G4");
+    expect(range).toContain("G#4");
+    expect(range).toContain("Ab4");
+    expect(range).toContain("A4");
+    expect(range).toContain("A#4");
+    expect(range).toContain("Bb4");
+    expect(range).toContain("B4");
+    expect(range).toContain("C5");
+    expect(range).toContain("C#5");
+    expect(range).toContain("Db5");
+    expect(range).toContain("D5");
+    expect(range).toContain("D#5");
+    expect(range).toContain("Eb5");
+    expect(range).toContain("E5");
+    expect(range).not.toContain("B3");
+    expect(range).not.toContain("E#4");
+    expect(range).not.toContain("Fb4");
+    expect(range).not.toContain("F5");
 });

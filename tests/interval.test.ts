@@ -273,3 +273,73 @@ test("Interval.simple produces correct result", () => {
     expect(m.simple.isEqual(n)).toBeTruthy();
     expect(m.negative.simple.isEqual(n.negative)).toBeTruthy();
 });
+
+test("Interval.range.diatonic produces correct range", () => {
+    let from = Interval.fromName("P1");
+    let to = Interval.fromName("P8");
+    let range = Array.from(Interval.range.diatonic(from, to)).map((m: Interval) => m.name);
+    expect(range).toContain("P1");
+    expect(range).toContain("m2");
+    expect(range).toContain("M2");
+    expect(range).toContain("m3");
+    expect(range).toContain("M3");
+    expect(range).toContain("P4");
+    expect(range).toContain("A4");
+    expect(range).toContain("d5");
+    expect(range).toContain("P5");
+    expect(range).toContain("m6");
+    expect(range).toContain("M6");
+    expect(range).toContain("m7");
+    expect(range).toContain("M7");
+    expect(range).toContain("P8");
+    expect(range).not.toContain("A5");
+    expect(range).not.toContain("-m2");
+    expect(range).not.toContain("m9");
+    expect(range).not.toContain("M9");
+    from = Interval.fromName("M3");
+    to = Interval.fromName("M10");
+    range = Array.from(Interval.range.diatonic(from, to)).map(m => m.name);
+    expect(range).not.toContain("P1");
+    expect(range).not.toContain("m2");
+    expect(range).not.toContain("M2");
+    expect(range).not.toContain("m3");
+    expect(range).toContain("M3");
+    expect(range).toContain("P4");
+    expect(range).toContain("A4");
+    expect(range).toContain("d5");
+    expect(range).toContain("P5");
+    expect(range).toContain("m6");
+    expect(range).toContain("M6");
+    expect(range).toContain("m7");
+    expect(range).toContain("M7");
+    expect(range).toContain("P8");
+    expect(range).toContain("m9");
+    expect(range).toContain("M9");
+    expect(range).toContain("m10");
+    expect(range).toContain("M10");
+    expect(range).not.toContain("A5");
+    expect(range).not.toContain("-m2");
+    expect(range).not.toContain("P11");
+})
+
+test("Interval.range.melodic produces correct range", () => {
+    let range = Array.from(Interval.range.melodic()).map(m => m.name);
+    expect(range).toContain("P1");
+    expect(range).toContain("m2");
+    expect(range).toContain("M2");
+    expect(range).toContain("m3");
+    expect(range).toContain("M3");
+    expect(range).toContain("P4");
+    expect(range).not.toContain("A4");
+    expect(range).not.toContain("d5");
+    expect(range).toContain("P5");
+    expect(range).toContain("m6");
+    expect(range).toContain("M6");
+    expect(range).not.toContain("m7");
+    expect(range).not.toContain("M7");
+    expect(range).toContain("P8");
+    expect(range).not.toContain("A5");
+    expect(range).not.toContain("-m2");
+    expect(range).not.toContain("m9");
+    expect(range).not.toContain("M9");
+})

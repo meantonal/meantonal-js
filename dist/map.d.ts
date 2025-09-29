@@ -61,7 +61,8 @@ export declare class TuningMap {
     private referencePitch;
     private referenceFreq;
     private centMap;
-    constructor(fifth: number, referencePitch?: string, referenceFreq?: number);
+    private midiMap?;
+    constructor(fifth: number, referencePitch?: string, referenceFreq?: number, midiMap?: Map1D);
     /**
      * Initialises an EDO tuning map by specifying the number of parts to
      * divide the octave into rather than the width of the fifth in cents.
@@ -79,4 +80,5 @@ export declare class TuningMap {
      * Renders the frequency of a Pitch vector in Hertz.
      */
     toHz(p: Pitch): number;
+    toMidi(p: Pitch): number;
 }

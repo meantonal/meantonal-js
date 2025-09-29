@@ -16,7 +16,7 @@ export declare class TonalContext {
         chroma: number;
     };
     mode: number;
-    chromaOffset: number;
+    private chromaOffset;
     constructor(chroma: number, mode: number);
     private static ACCIDENTAL_MAP;
     /**

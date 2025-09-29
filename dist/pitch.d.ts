@@ -1,4 +1,5 @@
 import { Interval } from "./interval";
+import { TuningMap } from "./map";
 import { TonalContext } from "./tonality";
 /**
  * The Pitch class is the most fundamental type in Meantonal.
@@ -111,9 +112,37 @@ export declare class Pitch {
      */
     transposeDiatonic(steps: number, context: TonalContext): Pitch;
     static range: {
+        /**
+         *  Create a diatonic range of Pitch vectors between two specified
+         *  pitches in a given TonalContext.
+         */
         diatonic(from: Pitch, to: Pitch, context: TonalContext): Generator<Pitch, void, unknown>;
+        /**
+         *  Create a full chromatic range of Pitch vectors between two specified
+         *  pitches in a given TonalContext.
+         *  Only pitches which could represent either diatonic or altered degrees
+         *  in the passed-in context will be included.
+         */
         chromatic(from: Pitch, to: Pitch, context: TonalContext): Generator<Pitch, void, unknown>;
     };
+    /**
+     * Returns the highest Pitch in a passed-in Pitch[] array.
+     * Uses optional passed-in TuningMap to decide whether one Pitch is higher
+     * than another, defaults to 12TET.
+     */
+    static highest(arr: Pitch[], T?: TuningMap): Pitch;
+    /**
+     * Returns the lowest Pitch in a passed-in Pitch[] array.
+     * Uses optional passed-in TuningMap to decide whether one Pitch is lower
+     * than another, defaults to 12TET.
+     */
+    static lowest(arr: Pitch[], T?: TuningMap): Pitch;
+    /**
+     * Returns the Pitch in a Pitch[] array closest to the calling Pitch.
+     * Uses optional passed-in TuningMap to decide whether one Pitch is closer
+     * than another, defaults to 12TET.
+     */
+    nearest(arr: Pitch[], T?: TuningMap): Pitch;
 }
 /**
  * The MirrorAxis class is used to invert pitches about a fixed point.

@@ -153,8 +153,63 @@ var _Pitch = class _Pitch {
   transposeDiatonic(steps, context) {
     return this.transposeReal(new Interval(steps, 0)).snapTo(context);
   }
+  /**
+   * Returns the highest Pitch in a passed-in Pitch[] array.
+   * Uses optional passed-in TuningMap to decide whether one Pitch is higher
+   * than another, defaults to 12TET.
+   */
+  static highest(arr, T = TuningMap.fromEDO(12)) {
+    return arr.reduce((a, c) => {
+      if (T.toHz(a) > T.toHz(c))
+        return a;
+      if (T.toHz(a) < T.toHz(c))
+        return c;
+      if (a.stepsTo(c) < 0)
+        return a;
+      return c;
+    });
+  }
+  /**
+   * Returns the lowest Pitch in a passed-in Pitch[] array.
+   * Uses optional passed-in TuningMap to decide whether one Pitch is lower
+   * than another, defaults to 12TET.
+   */
+  static lowest(arr, T = TuningMap.fromEDO(12)) {
+    return arr.reduce((a, c) => {
+      if (T.toHz(a) < T.toHz(c))
+        return a;
+      if (T.toHz(a) > T.toHz(c))
+        return c;
+      if (a.stepsTo(c) > 0)
+        return a;
+      return c;
+    });
+  }
+  /**
+   * Returns the Pitch in a Pitch[] array closest to the calling Pitch.
+   * Uses optional passed-in TuningMap to decide whether one Pitch is closer
+   * than another, defaults to 12TET.
+   */
+  nearest(arr, T = TuningMap.fromEDO(12)) {
+    function orientedRatioBetween(p, q) {
+      return Math.max(T.toRatio(p.intervalTo(q)), T.toRatio(q.intervalTo(p)));
+    }
+    const nearestByRatio = arr.sort((p, q) => {
+      return orientedRatioBetween(this, p) - orientedRatioBetween(this, q);
+    })[0];
+    const filteredByHz = arr.filter((p) => {
+      return orientedRatioBetween(this, p) === orientedRatioBetween(this, nearestByRatio);
+    });
+    return filteredByHz.sort((p, q) => {
+      return this.stepsTo(p) - this.stepsTo(q);
+    })[0];
+  }
 };
 _Pitch.range = {
+  /**
+   *  Create a diatonic range of Pitch vectors between two specified
+   *  pitches in a given TonalContext.
+   */
   *diatonic(from, to, context) {
     let m = new _Pitch(from.w, from.h);
     yield m.snapTo(context);
@@ -163,6 +218,12 @@ _Pitch.range = {
       yield new _Pitch(m.w, m.h);
     }
   },
+  /**
+   *  Create a full chromatic range of Pitch vectors between two specified
+   *  pitches in a given TonalContext.
+   *  Only pitches which could represent either diatonic or altered degrees
+   *  in the passed-in context will be included.
+   */
   *chromatic(from, to, context) {
     let current = new _Pitch(from.w, from.h);
     let miBelow = context.nearestMiBelow(current);
@@ -536,10 +597,13 @@ var Map2D = class _Map2D {
   }
 };
 var TuningMap = class _TuningMap {
-  constructor(fifth, referencePitch = "C4", referenceFreq = 261.6255653) {
+  constructor(fifth, referencePitch = "C4", referenceFreq = 261.6255653, midiMap) {
     this.referencePitch = SPN.toPitch(referencePitch);
     this.referenceFreq = referenceFreq;
     this.centMap = new Map1D(fifth, 1200);
+    if (midiMap !== void 0) {
+      this.midiMap = midiMap;
+    }
   }
   /**
    * Initialises an EDO tuning map by specifying the number of parts to
@@ -548,7 +612,10 @@ var TuningMap = class _TuningMap {
   static fromEDO(edo, referencePitch = "C4", referenceFreq = 261.6255653) {
     const fifthSteps = Math.round(Math.log2(1.5) * edo);
     const fifth = fifthSteps * 1200 / edo;
-    return new _TuningMap(fifth, referencePitch, referenceFreq);
+    const whole = (fifthSteps * 2 % edo + edo) % edo;
+    const half = (fifthSteps * -5 % edo + edo) % edo;
+    const midiMap = new Map1D(whole, half);
+    return new _TuningMap(fifth, referencePitch, referenceFreq, midiMap);
   }
   /**
    * Renders the width of an Interval in cents.
@@ -567,6 +634,11 @@ var TuningMap = class _TuningMap {
    */
   toHz(p) {
     return this.referenceFreq * this.toRatio(this.referencePitch.intervalTo(p));
+  }
+  toMidi(p) {
+    if (this.midiMap === void 0)
+      throw new Error("Pitch.toMidi can only be called from an EDO TuningMap.");
+    return this.midiMap.map(p);
   }
 };
 

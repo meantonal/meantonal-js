@@ -116,16 +116,21 @@ export class TuningMap {
     private referencePitch: Pitch;
     private referenceFreq: number;
     private centMap: Map1D;
+    private midiMap?: Map1D;
 
     constructor(
         fifth: number,
         referencePitch: string = "C4",
         referenceFreq: number = 261.6255653,
+        midiMap?: Map1D
     ) {
         this.referencePitch = SPN.toPitch(referencePitch);
         this.referenceFreq = referenceFreq;
 
         this.centMap = new Map1D(fifth, 1200);
+        if (midiMap !== undefined) {
+            this.midiMap = midiMap;
+        }
     }
 
     /**
@@ -139,7 +144,12 @@ export class TuningMap {
     ) {
         const fifthSteps = Math.round(Math.log2(1.5) * edo);
         const fifth = (fifthSteps * 1200) / edo;
-        return new TuningMap(fifth, referencePitch, referenceFreq);
+
+        const whole = ((fifthSteps * 2) % edo + edo) % edo;
+        const half = ((fifthSteps * -5) % edo + edo) % edo;
+        const midiMap = new Map1D(whole, half);
+
+        return new TuningMap(fifth, referencePitch, referenceFreq, midiMap);
     }
 
     /**
@@ -161,5 +171,11 @@ export class TuningMap {
      */
     toHz(p: Pitch) {
         return this.referenceFreq * this.toRatio(this.referencePitch.intervalTo(p));
+    }
+
+    toMidi(p: Pitch) {
+        if (this.midiMap === undefined)
+            throw new Error("Pitch.toMidi can only be called from an EDO TuningMap.");
+        return this.midiMap.map(p);
     }
 }

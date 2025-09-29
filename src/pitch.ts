@@ -1,4 +1,5 @@
 import { Interval } from "./interval";
+import { TuningMap } from "./map";
 import { SPN } from "./parse/spn";
 import { TonalContext } from "./tonality";
 
@@ -184,6 +185,10 @@ export class Pitch {
     }
 
     static range = {
+        /**
+         *  Create a diatonic range of Pitch vectors between two specified
+         *  pitches in a given TonalContext.
+         */
         *diatonic(from: Pitch, to: Pitch, context: TonalContext) {
             let m = new Pitch(from.w, from.h);
             yield m.snapTo(context);
@@ -192,6 +197,12 @@ export class Pitch {
                 yield new Pitch(m.w, m.h);
             }
         },
+        /**
+         *  Create a full chromatic range of Pitch vectors between two specified
+         *  pitches in a given TonalContext.
+         *  Only pitches which could represent either diatonic or altered degrees
+         *  in the passed-in context will be included.
+         */
         *chromatic(from: Pitch, to: Pitch, context: TonalContext) {
             let current = new Pitch(from.w, from.h);
             let miBelow = context.nearestMiBelow(current)
@@ -224,6 +235,64 @@ export class Pitch {
                 current.w++;
             }
         },
+    }
+
+    /**
+     * Returns the highest Pitch in a passed-in Pitch[] array.
+     * Uses optional passed-in TuningMap to decide whether one Pitch is higher
+     * than another, defaults to 12TET.
+     */
+    static highest(arr: Pitch[], T: TuningMap = TuningMap.fromEDO(12)) {
+        return arr.reduce((a, c) => {
+            if (T.toHz(a) > T.toHz(c))
+                return a;
+            if (T.toHz(a) < T.toHz(c))
+                return c;
+            if (a.stepsTo(c) < 0)
+                return a;
+            return c;
+        });
+    }
+
+    /**
+     * Returns the lowest Pitch in a passed-in Pitch[] array.
+     * Uses optional passed-in TuningMap to decide whether one Pitch is lower
+     * than another, defaults to 12TET.
+     */
+    static lowest(arr: Pitch[], T: TuningMap = TuningMap.fromEDO(12)) {
+        return arr.reduce((a, c) => {
+            if (T.toHz(a) < T.toHz(c))
+                return a;
+            if (T.toHz(a) > T.toHz(c))
+                return c;
+            if (a.stepsTo(c) > 0)
+                return a;
+            return c;
+        });
+    }
+
+    /**
+     * Returns the Pitch in a Pitch[] array closest to the calling Pitch.
+     * Uses optional passed-in TuningMap to decide whether one Pitch is closer
+     * than another, defaults to 12TET.
+     */
+    public nearest(arr: Pitch[], T: TuningMap = TuningMap.fromEDO(12)) {
+        function orientedRatioBetween(p: Pitch, q: Pitch) {
+            return Math.max(T.toRatio(p.intervalTo(q)), T.toRatio(q.intervalTo(p)))
+        }
+
+        const nearestByRatio = arr
+            .sort((p, q) => {
+                return orientedRatioBetween(this, p) - orientedRatioBetween(this, q);
+            })[0];
+
+        const filteredByHz = arr.filter((p) => {
+            return orientedRatioBetween(this, p) === orientedRatioBetween(this, nearestByRatio);
+        })
+
+        return filteredByHz.sort((p, q) => {
+            return this.stepsTo(p) - this.stepsTo(q)
+        })[0];
     }
 }
 

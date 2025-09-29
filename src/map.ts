@@ -173,7 +173,7 @@ export class TuningMap {
         return this.referenceFreq * this.toRatio(this.referencePitch.intervalTo(p));
     }
 
-    toMidi(p: Pitch) {
+    toMIDI(p: Pitch) {
         if (this.midiMap === undefined)
             throw new Error("Pitch.toMidi can only be called from an EDO TuningMap.");
         return this.midiMap.map(p);

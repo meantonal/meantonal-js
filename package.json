@@ -1,6 +1,6 @@
 {
   "name": "meantonal",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "description": "An elegant library for representing pitch in Western music.",
   "keywords": [
     "music",

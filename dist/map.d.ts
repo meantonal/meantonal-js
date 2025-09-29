@@ -80,5 +80,5 @@ export declare class TuningMap {
      * Renders the frequency of a Pitch vector in Hertz.
      */
     toHz(p: Pitch): number;
-    toMidi(p: Pitch): number;
+    toMIDI(p: Pitch): number;
 }

@@ -635,7 +635,7 @@ var TuningMap = class _TuningMap {
   toHz(p) {
     return this.referenceFreq * this.toRatio(this.referencePitch.intervalTo(p));
   }
-  toMidi(p) {
+  toMIDI(p) {
     if (this.midiMap === void 0)
       throw new Error("Pitch.toMidi can only be called from an EDO TuningMap.");
     return this.midiMap.map(p);

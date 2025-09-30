@@ -173,7 +173,13 @@ export class TuningMap {
         return this.referenceFreq * this.toRatio(this.referencePitch.intervalTo(p));
     }
 
-    toMIDI(p: Pitch) {
+    /**
+     * Renders the ordered pitch number of a Pitch vector.
+     * In 12TET, this will be the MIDI value of a Pitch, and provides an
+     * analogous ordered numbering for other EDO tuning systems.
+     * Only available in TuningMaps created with TuningMap.fromEDO()
+     */
+    toNumber(p: Pitch) {
         if (this.midiMap === undefined)
             throw new Error("Pitch.toMidi can only be called from an EDO TuningMap.");
         return this.midiMap.map(p);

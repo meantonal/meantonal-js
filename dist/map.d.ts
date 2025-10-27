@@ -61,8 +61,7 @@ export declare class TuningMap {
     private referencePitch;
     private referenceFreq;
     private centMap;
-    private midiMap?;
-    constructor(fifth: number, referencePitch?: string, referenceFreq?: number, midiMap?: Map1D);
+    constructor(fifth: number, referencePitch?: string, referenceFreq?: number);
     /**
      * Initialises an EDO tuning map by specifying the number of parts to
      * divide the octave into rather than the width of the fifth in cents.
@@ -80,6 +79,15 @@ export declare class TuningMap {
      * Renders the frequency of a Pitch vector in Hertz.
      */
     toHz(p: Pitch): number;
+}
+/**
+ * Transforms Pitch vectors into an ordered integer representation for a given
+ * EDO tuning. In 12TET, this numbering exactly corresponds to standard MIDI,
+ * and is designed to provide an analogous numbering for other EDO tunings.
+ */
+export declare class EDOMap {
+    private map;
+    constructor(edo: number);
     /**
      * Renders the ordered pitch number of a Pitch vector.
      * In 12TET, this will be the MIDI value of a Pitch, and provides an
@@ -87,4 +95,10 @@ export declare class TuningMap {
      * Only available in TuningMaps created with TuningMap.fromEDO()
      */
     toNumber(p: Pitch): number;
+    /**
+     * Returns a positive value if p sounds above q.
+     * Returns a negative value if p sounds below q.
+     * Returns 0 if p and q are enharmonic.
+     */
+    compare(p: Pitch, q: Pitch): number;
 }

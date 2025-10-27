@@ -603,13 +603,10 @@ var Map2D = class _Map2D {
   }
 };
 var TuningMap = class _TuningMap {
-  constructor(fifth, referencePitch = "C4", referenceFreq = 261.6255653, midiMap) {
+  constructor(fifth, referencePitch = "C4", referenceFreq = 261.6255653) {
     this.referencePitch = SPN.toPitch(referencePitch);
     this.referenceFreq = referenceFreq;
     this.centMap = new Map1D(fifth, 1200);
-    if (midiMap !== void 0) {
-      this.midiMap = midiMap;
-    }
   }
   /**
    * Initialises an EDO tuning map by specifying the number of parts to
@@ -618,10 +615,7 @@ var TuningMap = class _TuningMap {
   static fromEDO(edo, referencePitch = "C4", referenceFreq = 261.6255653) {
     const fifthSteps = Math.round(Math.log2(1.5) * edo);
     const fifth = fifthSteps * 1200 / edo;
-    const whole = (fifthSteps * 2 % edo + edo) % edo;
-    const half = (fifthSteps * -5 % edo + edo) % edo;
-    const midiMap = new Map1D(whole, half);
-    return new _TuningMap(fifth, referencePitch, referenceFreq, midiMap);
+    return new _TuningMap(fifth, referencePitch, referenceFreq);
   }
   /**
    * Renders the width of an Interval in cents.
@@ -641,6 +635,14 @@ var TuningMap = class _TuningMap {
   toHz(p) {
     return this.referenceFreq * this.toRatio(this.referencePitch.intervalTo(p));
   }
+};
+var EDOMap = class {
+  constructor(edo) {
+    const fifthSteps = Math.round(Math.log2(1.5) * edo);
+    const whole = (fifthSteps * 2 % edo + edo) % edo;
+    const half = (fifthSteps * -5 % edo + edo) % edo;
+    this.map = new Map1D(whole, half);
+  }
   /**
    * Renders the ordered pitch number of a Pitch vector.
    * In 12TET, this will be the MIDI value of a Pitch, and provides an
@@ -648,9 +650,15 @@ var TuningMap = class _TuningMap {
    * Only available in TuningMaps created with TuningMap.fromEDO()
    */
   toNumber(p) {
-    if (this.midiMap === void 0)
-      throw new Error("Pitch.toMidi can only be called from an EDO TuningMap.");
-    return this.midiMap.map(p);
+    return this.map.map(p);
+  }
+  /**
+   * Returns a positive value if p sounds above q.
+   * Returns a negative value if p sounds below q.
+   * Returns 0 if p and q are enharmonic.
+   */
+  compare(p, q) {
+    return this.map.map(p) - this.map.map(q);
   }
 };
 
@@ -682,16 +690,6 @@ var LETTER_COORDS = [
   { w: 5, h: 1 }
   // B
 ];
-var EDO7 = new Map1D(1, 1);
-var EDO12 = new Map1D(2, 1);
-var EDO17 = new Map1D(3, 1);
-var EDO19 = new Map1D(3, 2);
-var EDO22 = new Map1D(4, 1);
-var EDO31 = new Map1D(5, 3);
-var EDO50 = new Map1D(8, 5);
-var EDO53 = new Map1D(9, 4);
-var EDO55 = new Map1D(9, 5);
-var EDO81 = new Map1D(13, 8);
 var WICKI_TO = new Map2D(1, -3, 0, 1);
 var WICKI_FROM = new Map2D(1, 3, 0, 1);
 var GENERATORS_TO = new Map2D(2, -5, -1, 3);
@@ -967,16 +965,7 @@ var TonalContext = _TonalContext;
 export {
   ABC,
   Chroma,
-  EDO12,
-  EDO17,
-  EDO19,
-  EDO22,
-  EDO31,
-  EDO50,
-  EDO53,
-  EDO55,
-  EDO7,
-  EDO81,
+  EDOMap,
   GENERATORS_FROM,
   GENERATORS_TO,
   Helmholtz,

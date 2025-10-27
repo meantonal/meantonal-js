@@ -116,21 +116,16 @@ export class TuningMap {
     private referencePitch: Pitch;
     private referenceFreq: number;
     private centMap: Map1D;
-    private midiMap?: Map1D;
 
     constructor(
         fifth: number,
         referencePitch: string = "C4",
         referenceFreq: number = 261.6255653,
-        midiMap?: Map1D
     ) {
         this.referencePitch = SPN.toPitch(referencePitch);
         this.referenceFreq = referenceFreq;
 
         this.centMap = new Map1D(fifth, 1200);
-        if (midiMap !== undefined) {
-            this.midiMap = midiMap;
-        }
     }
 
     /**
@@ -145,11 +140,7 @@ export class TuningMap {
         const fifthSteps = Math.round(Math.log2(1.5) * edo);
         const fifth = (fifthSteps * 1200) / edo;
 
-        const whole = ((fifthSteps * 2) % edo + edo) % edo;
-        const half = ((fifthSteps * -5) % edo + edo) % edo;
-        const midiMap = new Map1D(whole, half);
-
-        return new TuningMap(fifth, referencePitch, referenceFreq, midiMap);
+        return new TuningMap(fifth, referencePitch, referenceFreq);
     }
 
     /**
@@ -173,6 +164,21 @@ export class TuningMap {
         return this.referenceFreq * this.toRatio(this.referencePitch.intervalTo(p));
     }
 
+}
+
+/**
+ * Transforms Pitch vectors into an ordered integer representation for a given
+ * EDO tuning. In 12TET, this numbering exactly corresponds to standard MIDI,
+ * and is designed to provide an analogous numbering for other EDO tunings.
+ */
+export class EDOMap {
+    private map: Map1D;
+    constructor(edo: number) {
+        const fifthSteps = Math.round(Math.log2(1.5) * edo);
+        const whole = ((fifthSteps * 2) % edo + edo) % edo;
+        const half = ((fifthSteps * -5) % edo + edo) % edo;
+        this.map = new Map1D(whole, half);
+    }
     /**
      * Renders the ordered pitch number of a Pitch vector.
      * In 12TET, this will be the MIDI value of a Pitch, and provides an
@@ -180,8 +186,15 @@ export class TuningMap {
      * Only available in TuningMaps created with TuningMap.fromEDO()
      */
     toNumber(p: Pitch) {
-        if (this.midiMap === undefined)
-            throw new Error("Pitch.toMidi can only be called from an EDO TuningMap.");
-        return this.midiMap.map(p);
+        return this.map.map(p);
+    }
+
+    /**
+     * Returns a positive value if p sounds above q.
+     * Returns a negative value if p sounds below q.
+     * Returns 0 if p and q are enharmonic.
+     */
+    compare(p: Pitch, q: Pitch) {
+        return this.map.map(p) - this.map.map(q);
     }
 }

@@ -194,6 +194,13 @@ export class Interval {
     }
 
     /**
+     * Adds an interval to itself the specified number of times
+     */
+    public times(x: number) {
+        return new Interval(this.w * x, this.h * x);
+    }
+
+    /**
      * The simple (i.e. non-compound / smaller than an octave) version of
      * an Interval vector. For simple intervals this will simply be the
      * same vector.

@@ -267,6 +267,12 @@ test("Interval.subtract produces correct result", () => {
     expect(m.subtract(n).isEqual(difference)).toBeTruthy();
 });
 
+test("Interval.times produces correct result", () => {
+    let m = Interval.fromName("P5");
+    let n = Interval.fromName("M13");
+    expect(m.times(3).isEqual(n)).toBeTruthy();
+});
+
 test("Interval.simple produces correct result", () => {
     let m = Interval.fromName("M17");
     let n = Interval.fromName("M3");

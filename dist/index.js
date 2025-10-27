@@ -470,6 +470,12 @@ var _Interval = class _Interval {
     return new _Interval(this.w - m.w, this.h - m.h);
   }
   /**
+   * Adds an interval to itself the specified number of times
+   */
+  times(x) {
+    return new _Interval(this.w * x, this.h * x);
+  }
+  /**
    * The simple (i.e. non-compound / smaller than an octave) version of
    * an Interval vector. For simple intervals this will simply be the
    * same vector.
@@ -635,7 +641,13 @@ var TuningMap = class _TuningMap {
   toHz(p) {
     return this.referenceFreq * this.toRatio(this.referencePitch.intervalTo(p));
   }
-  toMIDI(p) {
+  /**
+   * Renders the ordered pitch number of a Pitch vector.
+   * In 12TET, this will be the MIDI value of a Pitch, and provides an
+   * analogous ordered numbering for other EDO tuning systems.
+   * Only available in TuningMaps created with TuningMap.fromEDO()
+   */
+  toNumber(p) {
     if (this.midiMap === void 0)
       throw new Error("Pitch.toMidi can only be called from an EDO TuningMap.");
     return this.midiMap.map(p);

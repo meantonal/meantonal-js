@@ -80,5 +80,11 @@ export declare class TuningMap {
      * Renders the frequency of a Pitch vector in Hertz.
      */
     toHz(p: Pitch): number;
-    toMIDI(p: Pitch): number;
+    /**
+     * Renders the ordered pitch number of a Pitch vector.
+     * In 12TET, this will be the MIDI value of a Pitch, and provides an
+     * analogous ordered numbering for other EDO tuning systems.
+     * Only available in TuningMaps created with TuningMap.fromEDO()
+     */
+    toNumber(p: Pitch): number;
 }

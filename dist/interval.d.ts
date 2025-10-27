@@ -73,6 +73,10 @@ export declare class Interval {
     add(m: Interval): Interval;
     subtract(m: Interval): Interval;
     /**
+     * Adds an interval to itself the specified number of times
+     */
+    times(x: number): Interval;
+    /**
      * The simple (i.e. non-compound / smaller than an octave) version of
      * an Interval vector. For simple intervals this will simply be the
      * same vector.

@@ -42,10 +42,25 @@ export class Helmholtz {
 
     /**
      * Returns the Helmholtz note name of a Pitch.
+     * @throws if the Pitch's accidental is more than 8 sharps/flats away
+     * from a natural, or its octave falls outside -3 to 11 (a healthy
+     * margin beyond the range of human hearing). Both almost always
+     * indicate a logic error upstream.
      */
     static fromPitch(p: Pitch): string {
         let result;
         const accNumber = p.accidental;
+        if (Math.abs(accNumber) > 8) {
+            throw new Error(
+                `Cannot render Helmholtz name: accidental (${accNumber}) exceeds the maximum of ±8 sharps/flats.`,
+            );
+        }
+        if (p.octave < -3 || p.octave > 11) {
+            throw new Error(
+                `Cannot render Helmholtz name: octave (${p.octave}) is outside the representable range (-3 to 11).`,
+            );
+        }
+
         let accidental = "";
         if (accNumber == 2) accidental += "x";
         else if (accNumber > 0) accidental += "#".repeat(accNumber);

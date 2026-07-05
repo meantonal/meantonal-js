@@ -39,10 +39,26 @@ export class ABC {
 
     /**
      * Returns the ABC note name of a Pitch vector.
+     * @throws if the Pitch's accidental goes beyond a double sharp/flat, or
+     * its octave falls outside -3 to 11 (a healthy margin beyond the range
+     * of human hearing). ABC notation has no provision for anything beyond
+     * a double sharp/flat, and both almost always indicate a logic error
+     * upstream.
      */
     static fromPitch(p: Pitch): string {
         let result;
         const accNumber = p.accidental;
+        if (Math.abs(accNumber) > 2) {
+            throw new Error(
+                `Cannot render ABC name: accidental (${accNumber}) exceeds the double sharp/flat limit (±2).`,
+            );
+        }
+        if (p.octave < -3 || p.octave > 11) {
+            throw new Error(
+                `Cannot render ABC name: octave (${p.octave}) is outside the representable range (-3 to 11).`,
+            );
+        }
+
         let accidental = "";
         if (accNumber > 0) accidental += "^".repeat(accNumber);
         if (accNumber < 0) accidental += "_".repeat(-accNumber);

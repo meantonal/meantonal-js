@@ -38,11 +38,20 @@ export class SPN {
 
     /**
      * Returns the SPN name of a Pitch.
+     * @throws if the Pitch's accidental is altered by more than 8 sharps/flats,
+     * which is chosen as an arbitrary limit simply to avoid handling strings of
+     * unbounded size, and because it almost always indicates a logic error upstream.
      */
     static fromPitch(p: Pitch): string {
+        const accidental = p.accidental;
+        if (Math.abs(accidental) > 8) {
+            throw new Error(
+                `Cannot render SPN name: accidental (${accidental}) exceeds the maximum of ±8 sharps/flats.`,
+            );
+        }
+
         let result = p.letter;
 
-        const accidental = p.accidental;
         if (accidental == 2) result += "x";
         else if (accidental > 0) result += "#".repeat(accidental);
         if (accidental < 0) result += "b".repeat(-accidental);

@@ -30,6 +30,18 @@ test("SPN.fromPitch produces correct result", () => {
     expect(SPN.fromPitch(p)).toEqual("Gbbbb7");
 });
 
+test("SPN.fromPitch throws for an accidental beyond ±8", () => {
+    // Adding n to w and subtracting n from h raises the accidental by n
+    // without changing the letter or octave.
+    let p = SPN.toPitch("C4");
+    p.w += 8;
+    p.h -= 8;
+    expect(SPN.fromPitch(p)).toEqual("C" + "#".repeat(8) + "4");
+    p.w += 1;
+    p.h -= 1;
+    expect(() => SPN.fromPitch(p)).toThrow();
+});
+
 test("LilyPond.toPitch creates correct Pitch vector", () => {
     let p = LilyPond.toPitch("c'");
     expect(p.w).toEqual(25);
@@ -61,6 +73,48 @@ test("LilyPong.fromPitch produces correct result", () => {
     lily = "eeses,,,,";
     p = LilyPond.toPitch(lily);
     expect(LilyPond.fromPitch(p)).toEqual(lily);
+});
+
+test("LilyPond.fromPitch throws for an accidental beyond ±2", () => {
+    // Adding n to w and subtracting n from h raises the accidental by n
+    // without changing the letter or octave.
+    let p = LilyPond.toPitch("c");
+    p.w += 2;
+    p.h -= 2;
+    expect(LilyPond.fromPitch(p)).toEqual("c" + "is".repeat(2));
+    p.w += 1;
+    p.h -= 1;
+    expect(() => LilyPond.fromPitch(p)).toThrow();
+
+    p = LilyPond.toPitch("c");
+    p.w -= 2;
+    p.h += 2;
+    expect(LilyPond.fromPitch(p)).toEqual("c" + "es".repeat(2));
+    p.w -= 1;
+    p.h += 1;
+    expect(() => LilyPond.fromPitch(p)).toThrow();
+});
+
+test("LilyPond.fromPitch throws for an octave outside -3 to 11", () => {
+    // Adding (5, 2) transposes up an octave without changing the accidental.
+    let p = LilyPond.toPitch("c");
+    expect(p.octave).toEqual(3);
+    p.w += 5 * 8;
+    p.h += 2 * 8;
+    expect(p.octave).toEqual(11);
+    expect(LilyPond.fromPitch(p)).toEqual("c" + "'".repeat(8));
+    p.w += 5;
+    p.h += 2;
+    expect(() => LilyPond.fromPitch(p)).toThrow();
+
+    p = LilyPond.toPitch("c");
+    p.w -= 5 * 6;
+    p.h -= 2 * 6;
+    expect(p.octave).toEqual(-3);
+    expect(LilyPond.fromPitch(p)).toEqual("c" + ",".repeat(6));
+    p.w -= 5;
+    p.h -= 2;
+    expect(() => LilyPond.fromPitch(p)).toThrow();
 });
 
 test("Helmholtz.toPitch produces correct result", () => {
@@ -96,6 +150,39 @@ test("Helmholtz.fromPitch produces correct result", () => {
     expect(Helmholtz.fromPitch(p)).toEqual(helm);
 });
 
+test("Helmholtz.fromPitch throws for an accidental beyond ±8", () => {
+    let p = Helmholtz.toPitch("c");
+    p.w += 8;
+    p.h -= 8;
+    expect(Helmholtz.fromPitch(p)).toEqual("c" + "#".repeat(8));
+    p.w += 1;
+    p.h -= 1;
+    expect(() => Helmholtz.fromPitch(p)).toThrow();
+});
+
+test("Helmholtz.fromPitch throws for an octave outside -3 to 11", () => {
+    // Adding (5, 2) transposes up an octave without changing the accidental.
+    let p = Helmholtz.toPitch("c'"); // octave 4
+    expect(p.octave).toEqual(4);
+    p.w += 5 * 7;
+    p.h += 2 * 7;
+    expect(p.octave).toEqual(11);
+    expect(Helmholtz.fromPitch(p)).toEqual("c" + "'".repeat(8));
+    p.w += 5;
+    p.h += 2;
+    expect(() => Helmholtz.fromPitch(p)).toThrow();
+
+    p = Helmholtz.toPitch("C"); // octave 2
+    expect(p.octave).toEqual(2);
+    p.w -= 5 * 5;
+    p.h -= 2 * 5;
+    expect(p.octave).toEqual(-3);
+    expect(Helmholtz.fromPitch(p)).toEqual("C" + ",".repeat(5));
+    p.w -= 5;
+    p.h -= 2;
+    expect(() => Helmholtz.fromPitch(p)).toThrow();
+});
+
 test("ABC.toPitch produces correct result", () => {
     let p = ABC.toPitch("C");
     expect(p.w).toEqual(25);
@@ -127,4 +214,46 @@ test("ABC.fromPitch produces correct result", () => {
     abc = "^^f'''";
     p = ABC.toPitch(abc);
     expect(ABC.fromPitch(p)).toEqual(abc);
+});
+
+test("ABC.fromPitch throws for an accidental beyond ±2", () => {
+    // Adding n to w and subtracting n from h raises the accidental by n
+    // without changing the letter or octave.
+    let p = ABC.toPitch("c");
+    p.w += 2;
+    p.h -= 2;
+    expect(ABC.fromPitch(p)).toEqual("^".repeat(2) + "c");
+    p.w += 1;
+    p.h -= 1;
+    expect(() => ABC.fromPitch(p)).toThrow();
+
+    p = ABC.toPitch("c");
+    p.w -= 2;
+    p.h += 2;
+    expect(ABC.fromPitch(p)).toEqual("_".repeat(2) + "c");
+    p.w -= 1;
+    p.h += 1;
+    expect(() => ABC.fromPitch(p)).toThrow();
+});
+
+test("ABC.fromPitch throws for an octave outside -3 to 11", () => {
+    // Adding (5, 2) transposes up an octave without changing the accidental.
+    let p = ABC.toPitch("c");
+    expect(p.octave).toEqual(5);
+    p.w += 5 * 6;
+    p.h += 2 * 6;
+    expect(p.octave).toEqual(11);
+    expect(ABC.fromPitch(p)).toEqual("c" + "'".repeat(6));
+    p.w += 5;
+    p.h += 2;
+    expect(() => ABC.fromPitch(p)).toThrow();
+
+    p = ABC.toPitch("c");
+    p.w -= 5 * 8;
+    p.h -= 2 * 8;
+    expect(p.octave).toEqual(-3);
+    expect(ABC.fromPitch(p)).toEqual("C" + ",".repeat(7));
+    p.w -= 5;
+    p.h -= 2;
+    expect(() => ABC.fromPitch(p)).toThrow();
 });

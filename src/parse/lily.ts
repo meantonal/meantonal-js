@@ -42,11 +42,26 @@ export class LilyPond {
 
     /**
      * Returns the (absolute) LilyPond name of a Pitch.
+     * @throws if the Pitch's accidental goes beyond a double sharp/flat, or
+     * its octave falls outside -3 to 11 (a healthy margin beyond the range
+     * of human hearing). Neither is representable in real LilyPond input,
+     * and both almost always indicate a logic error upstream.
      */
     static fromPitch(p: Pitch): string {
+        const accidental = p.accidental;
+        if (Math.abs(accidental) > 2) {
+            throw new Error(
+                `Cannot render LilyPond name: accidental (${accidental}) exceeds the double sharp/flat limit (±2).`,
+            );
+        }
+        if (p.octave < -3 || p.octave > 11) {
+            throw new Error(
+                `Cannot render LilyPond name: octave (${p.octave}) is outside the representable range (-3 to 11).`,
+            );
+        }
+
         let result = p.letter.toLowerCase();
 
-        const accidental = p.accidental;
         if (accidental > 0) result += "is".repeat(accidental);
         if (accidental < 0) result += "es".repeat(-accidental);
 

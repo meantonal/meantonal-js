@@ -238,6 +238,17 @@ export class Pitch {
     }
 
     /**
+     * Returns true if p is within the approximate average range of human hearing.
+     * That is, roughly: between 20Hz - 20kHz
+     */
+    static audible(p: Pitch, T: TuningMap = TuningMap.fromEDO(12)) {
+        const f = T.toHz(p);
+        if (f < 20) return false;
+        if (f > 20000) return false;
+        return true;
+    }
+
+    /**
      * Returns the highest Pitch in a passed-in Pitch[] array.
      * Uses optional passed-in TuningMap to decide whether one Pitch is higher
      * than another, defaults to 12TET.

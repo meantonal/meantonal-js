@@ -1,4 +1,4 @@
-import { Pitch, MirrorAxis, SPN, LilyPond, Helmholtz, TonalContext } from "../src";
+import { Pitch, MirrorAxis, SPN, LilyPond, Helmholtz, TonalContext, TuningMap } from "../src";
 import { Interval } from "../src";
 
 test("Pitch.fromChroma creates correct Pitch vector", () => {
@@ -8,6 +8,31 @@ test("Pitch.fromChroma creates correct Pitch vector", () => {
     p = Pitch.fromChroma(6, 4);
     expect(p.w).toEqual(28);
     expect(p.h).toEqual(10);
+});
+
+test("Pitch.audible produces correct result", () => {
+    const T = TuningMap.fromEDO(12, "A4", 440);
+
+    // A4 (440Hz): comfortably within range.
+    expect(Pitch.audible(SPN.toPitch("A4"), T)).toBeTruthy();
+
+    // C0 (~16.35Hz) and C-1 (~8.18Hz): below 20Hz.
+    expect(Pitch.audible(SPN.toPitch("C0"), T)).toBeFalsy();
+    expect(Pitch.audible(SPN.toPitch("C-1"), T)).toBeFalsy();
+
+    // A0 (27.5Hz): just above 20Hz.
+    expect(Pitch.audible(SPN.toPitch("A0"), T)).toBeTruthy();
+
+    // C10 (~16.7kHz): below 20kHz.
+    expect(Pitch.audible(SPN.toPitch("C10"), T)).toBeTruthy();
+
+    // C11 (~33.5kHz): above 20kHz.
+    expect(Pitch.audible(SPN.toPitch("C11"), T)).toBeFalsy();
+});
+
+test("Pitch.audible falls back to a default 12-EDO tuning map", () => {
+    // C4 at the default reference (C4 = 261.6255653Hz) is well within range.
+    expect(Pitch.audible(SPN.toPitch("C4"))).toBeTruthy();
 });
 
 test("Pitch.midi produces correct result", () => {

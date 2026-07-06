@@ -126,6 +126,11 @@ export declare class Pitch {
         chromatic(from: Pitch, to: Pitch, context: TonalContext): Generator<Pitch, void, unknown>;
     };
     /**
+     * Returns true if p is within the approximate average range of human hearing.
+     * That is, roughly: between 20Hz - 20kHz
+     */
+    static audible(p: Pitch, T?: TuningMap): boolean;
+    /**
      * Returns the highest Pitch in a passed-in Pitch[] array.
      * Uses optional passed-in TuningMap to decide whether one Pitch is higher
      * than another, defaults to 12TET.

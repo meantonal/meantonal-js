@@ -53,7 +53,7 @@ export declare class Map2D {
 }
 /**
  * Represents a map onto a given tuning system. Specified in terms of the width
- * of its fifth, and the name and frequency of a reference pitch in Hz
+ * of its fifth in cents, and the name and frequency of a reference pitch in Hz
  * (e.g. A = 440).
  * - Reference pitch is optional, defaults to C4 = 261.6255653Hz.
  */

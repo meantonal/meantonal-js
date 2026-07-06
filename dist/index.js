@@ -154,6 +154,16 @@ var _Pitch = class _Pitch {
     return this.transposeReal(new Interval(steps, 0)).snapTo(context);
   }
   /**
+   * Returns true if p is within the approximate average range of human hearing.
+   * That is, roughly: between 20Hz - 20kHz
+   */
+  static audible(p, T = TuningMap.fromEDO(12)) {
+    const f = T.toHz(p);
+    if (f < 20) return false;
+    if (f > 2e4) return false;
+    return true;
+  }
+  /**
    * Returns the highest Pitch in a passed-in Pitch[] array.
    * Uses optional passed-in TuningMap to decide whether one Pitch is higher
    * than another, defaults to 12TET.
@@ -299,10 +309,18 @@ var SPN = class {
   }
   /**
    * Returns the SPN name of a Pitch.
+   * @throws if the Pitch's accidental is altered by more than 8 sharps/flats,
+   * which is chosen as an arbitrary limit simply to avoid handling strings of
+   * unbounded size, and because it almost always indicates a logic error upstream.
    */
   static fromPitch(p) {
-    let result = p.letter;
     const accidental = p.accidental;
+    if (Math.abs(accidental) > 8) {
+      throw new Error(
+        `Cannot render SPN name: accidental (${accidental}) exceeds the maximum of \xB18 sharps/flats.`
+      );
+    }
+    let result = p.letter;
     if (accidental == 2) result += "x";
     else if (accidental > 0) result += "#".repeat(accidental);
     if (accidental < 0) result += "b".repeat(-accidental);
@@ -604,6 +622,8 @@ var Map2D = class _Map2D {
 };
 var TuningMap = class _TuningMap {
   constructor(fifth, referencePitch = "C4", referenceFreq = 261.6255653) {
+    if (fifth < 1200 * 4 / 7 || fifth > 1200 * 3 / 5)
+      throw new Error("TuningMap requires a fifth between ~685.7\xA2 and 720\xA2 to produce a well - defined diatonic.");
     this.referencePitch = SPN.toPitch(referencePitch);
     this.referenceFreq = referenceFreq;
     this.centMap = new Map1D(fifth, 1200);
@@ -615,6 +635,8 @@ var TuningMap = class _TuningMap {
   static fromEDO(edo, referencePitch = "C4", referenceFreq = 261.6255653) {
     const fifthSteps = Math.round(Math.log2(1.5) * edo);
     const fifth = fifthSteps * 1200 / edo;
+    if (fifth < 1200 * 4 / 7 || fifth > 1200 * 3 / 5)
+      throw new Error(`${edo}-EDO does not support a diatonic scale.`);
     return new _TuningMap(fifth, referencePitch, referenceFreq);
   }
   /**
@@ -639,6 +661,9 @@ var TuningMap = class _TuningMap {
 var EDOMap = class {
   constructor(edo) {
     const fifthSteps = Math.round(Math.log2(1.5) * edo);
+    const fifth = fifthSteps * 1200 / edo;
+    if (fifth < 1200 * 4 / 7 || fifth > 1200 * 3 / 5)
+      throw new Error(`${edo}-EDO does not support a diatonic scale.`);
     const whole = (fifthSteps * 2 % edo + edo) % edo;
     const half = (fifthSteps * -5 % edo + edo) % edo;
     this.map = new Map1D(whole, half);
@@ -748,10 +773,24 @@ var LilyPond = class {
   }
   /**
    * Returns the (absolute) LilyPond name of a Pitch.
+   * @throws if the Pitch's accidental goes beyond a double sharp/flat, or
+   * its octave falls outside -3 to 11 (a healthy margin beyond the range
+   * of human hearing). Neither is representable in real LilyPond input,
+   * and both almost always indicate a logic error upstream.
    */
   static fromPitch(p) {
-    let result = p.letter.toLowerCase();
     const accidental = p.accidental;
+    if (Math.abs(accidental) > 2) {
+      throw new Error(
+        `Cannot render LilyPond name: accidental (${accidental}) exceeds the double sharp/flat limit (\xB12).`
+      );
+    }
+    if (p.octave < -3 || p.octave > 11) {
+      throw new Error(
+        `Cannot render LilyPond name: octave (${p.octave}) is outside the representable range (-3 to 11).`
+      );
+    }
+    let result = p.letter.toLowerCase();
     if (accidental > 0) result += "is".repeat(accidental);
     if (accidental < 0) result += "es".repeat(-accidental);
     const octave = p.octave - 3;
@@ -793,10 +832,24 @@ var Helmholtz = class {
   }
   /**
    * Returns the Helmholtz note name of a Pitch.
+   * @throws if the Pitch's accidental is more than 8 sharps/flats away
+   * from a natural, or its octave falls outside -3 to 11 (a healthy
+   * margin beyond the range of human hearing). Both almost always
+   * indicate a logic error upstream.
    */
   static fromPitch(p) {
     let result;
     const accNumber = p.accidental;
+    if (Math.abs(accNumber) > 8) {
+      throw new Error(
+        `Cannot render Helmholtz name: accidental (${accNumber}) exceeds the maximum of \xB18 sharps/flats.`
+      );
+    }
+    if (p.octave < -3 || p.octave > 11) {
+      throw new Error(
+        `Cannot render Helmholtz name: octave (${p.octave}) is outside the representable range (-3 to 11).`
+      );
+    }
     let accidental = "";
     if (accNumber == 2) accidental += "x";
     else if (accNumber > 0) accidental += "#".repeat(accNumber);
@@ -839,10 +892,25 @@ var ABC = class {
   }
   /**
    * Returns the ABC note name of a Pitch vector.
+   * @throws if the Pitch's accidental goes beyond a double sharp/flat, or
+   * its octave falls outside -3 to 11 (a healthy margin beyond the range
+   * of human hearing). ABC notation has no provision for anything beyond
+   * a double sharp/flat, and both almost always indicate a logic error
+   * upstream.
    */
   static fromPitch(p) {
     let result;
     const accNumber = p.accidental;
+    if (Math.abs(accNumber) > 2) {
+      throw new Error(
+        `Cannot render ABC name: accidental (${accNumber}) exceeds the double sharp/flat limit (\xB12).`
+      );
+    }
+    if (p.octave < -3 || p.octave > 11) {
+      throw new Error(
+        `Cannot render ABC name: octave (${p.octave}) is outside the representable range (-3 to 11).`
+      );
+    }
     let accidental = "";
     if (accNumber > 0) accidental += "^".repeat(accNumber);
     if (accNumber < 0) accidental += "_".repeat(-accNumber);

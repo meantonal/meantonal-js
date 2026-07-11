@@ -40,10 +40,13 @@ export declare class TonalContext {
     degreeAlteration(p: Pitch): number;
     /**
      * Returns the chroma (signed distance in perfect 5ths from C) of the
-     * diatonic variant of the passed in scale degree (0-indexed so the tonic
-     * is 0).
+     * variant of the passed in scale degree (0-indexed so the tonic is 0)
+     * that matches the specified alteration (or diatonic if unspecified).
+     *
+     * Note: this method doesn't enforce the 17-fifths window used to define
+     * keys, and will happily produce a degree altered by 4 chromatic semitones.
      */
-    degreeChroma(degree: number): number;
+    degreeChroma(degree: number, alteration?: number): number;
     /**
      * Snaps a Pitch vector to the diatonic position for that letter-name in
      * the current TonalContext.

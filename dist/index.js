@@ -265,7 +265,6 @@ _Pitch.range = {
       end.h--;
     }
     yield new _Pitch(current.w, current.h);
-    i;
     while (!current.isEqual(end)) {
       if (current.alterationIn(context) == -1) {
         current.w += 1;
@@ -1006,11 +1005,14 @@ var _TonalContext = class _TonalContext {
   }
   /**
    * Returns the chroma (signed distance in perfect 5ths from C) of the
-   * diatonic variant of the passed in scale degree (0-indexed so the tonic
-   * is 0).
+   * variant of the passed in scale degree (0-indexed so the tonic is 0)
+   * that matches the specified alteration (or diatonic if unspecified).
+   *
+   * Note: this method doesn't enforce the 17-fifths window used to define
+   * keys, and will happily produce a degree altered by 4 chromatic semitones.
    */
-  degreeChroma(degree) {
-    return (degree * 2 + this.mode) % 7 - this.chromaOffset;
+  degreeChroma(degree, alteration = 0) {
+    return (degree * 2 + this.mode) % 7 + alteration * 7 - this.chromaOffset;
   }
   /**
    * Snaps a Pitch vector to the diatonic position for that letter-name in

@@ -239,7 +239,6 @@ export class Pitch {
             }
 
             yield new Pitch(current.w, current.h);
-i
             while (!current.isEqual(end)) {
                 if (current.alterationIn(context) == -1) {
                     current.w += 1;

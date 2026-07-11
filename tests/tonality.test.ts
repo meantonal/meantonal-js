@@ -60,6 +60,9 @@ test("TonalContext.degreeChroma produces correct result", () => {
     expect(context.degreeChroma(4)).toEqual(2);
     expect(context.degreeChroma(5)).toEqual(-3);
     expect(context.degreeChroma(6)).toEqual(-1);
+    expect(context.degreeChroma(3, 1)).toEqual(7);
+    expect(context.degreeChroma(3, -1)).toEqual(-7);
+    expect(context.degreeChroma(3, 3)).toEqual(21);
 });
 
 test("TonalContext.snapDiatonic produces correct result", () => {

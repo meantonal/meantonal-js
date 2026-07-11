@@ -93,11 +93,14 @@ export class TonalContext {
 
     /**
      * Returns the chroma (signed distance in perfect 5ths from C) of the
-     * diatonic variant of the passed in scale degree (0-indexed so the tonic
-     * is 0).
+     * variant of the passed in scale degree (0-indexed so the tonic is 0)
+     * that matches the specified alteration (or diatonic if unspecified).
+     *
+     * Note: this method doesn't enforce the 17-fifths window used to define
+     * keys, and will happily produce a degree altered by 4 chromatic semitones.
      */
-    public degreeChroma(degree: number): number {
-        return ((degree * 2 + this.mode) % 7) - this.chromaOffset;
+    public degreeChroma(degree: number, alteration: number = 0): number {
+        return ((degree * 2 + this.mode) % 7) + (alteration * 7) - this.chromaOffset;
     }
 
     /**

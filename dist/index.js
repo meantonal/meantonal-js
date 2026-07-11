@@ -392,8 +392,17 @@ var _Interval = class _Interval {
   get chroma() {
     return this.w * 2 - this.h * 5;
   }
+  /**
+   * Returns true if the Interval can occur diatonically.
+   */
   get isDiatonic() {
     return Math.abs(this.chroma) < 7;
+  }
+  /**
+   * Returns true if the Interval can occur tonally, including via chromaticism.
+   */
+  get isTonal() {
+    return Math.abs(this.chroma) < 17;
   }
   /**
    * The quality of an Interval as a signed number:
@@ -504,6 +513,8 @@ var _Interval = class _Interval {
   }
 };
 _Interval.range = {
+  // Generates a range of Intervals between two boundary Intervals that
+  // can be found within the diatonic scale.
   *diatonic(from = new _Interval(0, 0), to = new _Interval(5, 2)) {
     const octave = new _Interval(5, 2);
     let current = new _Interval(from.w, from.h);
@@ -534,6 +545,9 @@ _Interval.range = {
       current.w++;
     }
   },
+  // Generates a range of all the Intervals traditionally considered easy
+  // for singers to sing. Essentially all the diatonic Intervals up to
+  // and including the octave, excluding A4, d5, m7 and M7.
   *melodic() {
     let m = new _Interval(0, 0);
     while (m.w <= 5) {

@@ -117,6 +117,20 @@ test("LilyPond.fromPitch throws for an octave outside -3 to 11", () => {
     expect(() => LilyPond.fromPitch(p)).toThrow();
 });
 
+test("LilyPond.relative parser class creates correct Pitch vector", () => {
+    let p = SPN.toPitch("C4");
+    let parser = LilyPond.relative(p);
+    p = parser.toPitch("g")
+    expect(p.w).toEqual(23);
+    expect(p.h).toEqual(9);
+    p = parser.toPitch("fisis'");
+    expect(p.w).toEqual(29);
+    expect(p.h).toEqual(9);
+    p = parser.toPitch("c");
+    expect(p.w).toEqual(25);
+    expect(p.h).toEqual(10);
+});
+
 test("Helmholtz.toPitch produces correct result", () => {
     let p = Helmholtz.toPitch("c'");
     expect(p.w).toEqual(25);

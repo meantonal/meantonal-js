@@ -71,4 +71,60 @@ export class LilyPond {
 
         return result;
     }
+
+    static relative(start: Pitch) {
+        return new RelativeParser(start);
+    }
+}
+
+class RelativeParser {
+    private previous: Pitch;
+    constructor(start: Pitch) {
+        this.previous = start;
+    }
+    
+    public toPitch(str: string): Pitch {
+        const regex = /^([a-g])((?:is|es)*)((?:'|,)*)$/;
+        const match = str.match(regex);
+        if (!match) {
+            throw new Error(`Invalid LilyPond note name: ${str}`);
+        }
+
+        const [, letter, accidentalStr, octaveStr] = match;
+
+        let accidental = accidentalStr.split("s").reduce((a, c) => {
+            if (c === "i") return a + 1;
+            if (c === "e") return a - 1;
+            return a;
+        }, 0);
+
+        const octave =
+            octaveStr.split("").reduce((a, c) => {
+                if (c === "'") return a + 1;
+                if (c === ",") return a - 1;
+                return a;
+            }, 0);
+
+        let { w, h } = LETTER_COORDS["cdefgab".indexOf(letter)];
+        w += accidental;
+        h -= accidental;
+
+        let result = new Pitch(w, h);
+
+        while (result.intervalTo(this.previous).stepspan > 3) {
+            result.w += 5;
+            result.h += 2;
+        }
+        while (result.intervalTo(this.previous).stepspan < -3) {
+            result.w -= 5;
+            result.h -= 2;
+        }
+
+        result.w += 5 * octave;
+        result.h += 2 * octave;
+
+        this.previous = new Pitch(result.w, result.h);
+
+        return result;
+    }
 }

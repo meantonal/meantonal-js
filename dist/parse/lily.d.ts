@@ -15,4 +15,11 @@ export declare class LilyPond {
      * and both almost always indicate a logic error upstream.
      */
     static fromPitch(p: Pitch): string;
+    static relative(start: Pitch): RelativeParser;
 }
+declare class RelativeParser {
+    private previous;
+    constructor(start: Pitch);
+    toPitch(str: string): Pitch;
+}
+export {};

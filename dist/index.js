@@ -23,6 +23,17 @@ var _Pitch = class _Pitch {
     return new _Pitch(w, h);
   }
   /**
+   * Returns a Pitch specified by its degree (0-indexed so the tonic is 0)
+   * and alteration (0 == diatonic) within a TonalContext, along with its
+   * octave number (SPN numbering).
+   *
+   * Note: this function doesn't enforce the 17-fifths window used to define
+   * keys, and will happily produce a degree altered by 4 chromatic semitones.
+   */
+  static fromDegree(degree, alteration, octave, context) {
+    return _Pitch.fromChroma(context.degreeChroma(degree, alteration), octave);
+  }
+  /**
    * Returns the standard MIDI number for a Pitch.
    * Throws if outside of the standard MIDI range 0 <= x <128
    */
@@ -820,6 +831,48 @@ var LilyPond = class {
     const octave = p.octave - 3;
     if (octave > 0) result += "'".repeat(octave);
     if (octave < 0) result += ",".repeat(-octave);
+    return result;
+  }
+  static relative(start) {
+    return new RelativeParser(start);
+  }
+};
+var RelativeParser = class {
+  constructor(start) {
+    this.previous = start;
+  }
+  toPitch(str) {
+    const regex = /^([a-g])((?:is|es)*)((?:'|,)*)$/;
+    const match = str.match(regex);
+    if (!match) {
+      throw new Error(`Invalid LilyPond note name: ${str}`);
+    }
+    const [, letter, accidentalStr, octaveStr] = match;
+    let accidental = accidentalStr.split("s").reduce((a, c) => {
+      if (c === "i") return a + 1;
+      if (c === "e") return a - 1;
+      return a;
+    }, 0);
+    const octave = octaveStr.split("").reduce((a, c) => {
+      if (c === "'") return a + 1;
+      if (c === ",") return a - 1;
+      return a;
+    }, 0);
+    let { w, h } = LETTER_COORDS["cdefgab".indexOf(letter)];
+    w += accidental;
+    h -= accidental;
+    let result = new Pitch(w, h);
+    while (result.intervalTo(this.previous).stepspan > 3) {
+      result.w += 5;
+      result.h += 2;
+    }
+    while (result.intervalTo(this.previous).stepspan < -3) {
+      result.w -= 5;
+      result.h -= 2;
+    }
+    result.w += 5 * octave;
+    result.h += 2 * octave;
+    this.previous = new Pitch(result.w, result.h);
     return result;
   }
 };

@@ -37,6 +37,18 @@ export class Pitch {
     }
 
     /**
+     * Returns a Pitch specified by its degree (0-indexed so the tonic is 0)
+     * and alteration (0 == diatonic) within a TonalContext, along with its
+     * octave number (SPN numbering).
+     *
+     * Note: this function doesn't enforce the 17-fifths window used to define
+     * keys, and will happily produce a degree altered by 4 chromatic semitones.
+     */
+    static fromDegree(degree: number, alteration: number, octave: number, context: TonalContext) {
+        return Pitch.fromChroma(context.degreeChroma(degree, alteration), octave);
+    }
+
+    /**
      * Returns the standard MIDI number for a Pitch.
      * Throws if outside of the standard MIDI range 0 <= x <128
      */

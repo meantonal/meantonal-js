@@ -1,6 +1,19 @@
 import { Pitch, MirrorAxis, SPN, LilyPond, Helmholtz, TonalContext, TuningMap } from "../src";
 import { Interval } from "../src";
 
+test("Pitch.fromDegree creates correct Pitch vector", () => {
+    let context = TonalContext.fromStrings("C", "major")
+    let p = Pitch.fromDegree(0, 0, 4, context);
+    expect(p.w).toEqual(25);
+    expect(p.h).toEqual(10);
+    p = Pitch.fromDegree(0, 2, 4, context);
+    expect(p.w).toEqual(27);
+    expect(p.h).toEqual(8);
+    p = Pitch.fromDegree(5, -1, 3, context);
+    expect(p.w).toEqual(23);
+    expect(p.h).toEqual(10);
+});
+
 test("Pitch.fromChroma creates correct Pitch vector", () => {
     let p = Pitch.fromChroma(0, 4);
     expect(p.w).toEqual(25);

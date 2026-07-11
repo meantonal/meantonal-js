@@ -235,36 +235,47 @@ _Pitch.range = {
    *  in the passed-in context will be included.
    */
   *chromatic(from, to, context) {
-    let current = new _Pitch(from.w, from.h);
-    let miBelow = context.nearestMiBelow(current);
-    let floor = miBelow.h;
-    let middle = context.nextMiAbove(miBelow);
-    const end = to;
-    while (middle.stepsTo(end) > 0) {
-      while (current.w <= middle.w - 1) {
-        while (current.h <= middle.h + 1) {
-          if (current.stepsTo(from) > 0) {
-            current.h++;
-            continue;
-          }
-          yield new _Pitch(current.w, current.h);
-          current.h++;
-        }
-        current.h = floor;
-        current.w++;
-      }
-      floor = middle.h;
-      middle = context.nextMiAbove(middle);
+    if (from.intervalTo(to).stepspan < 0) {
+      let swap = from;
+      from = to;
+      to = swap;
     }
-    while (current.w <= end.w) {
-      while (current.h <= middle.h + 1) {
-        if (current.stepsTo(end) < 0) return;
-        yield new _Pitch(current.w, current.h);
+    let current = new _Pitch(from.w, from.h);
+    while (current.alterationIn(context) < -1) {
+      current.w++;
+      current.h--;
+    }
+    if (current.alterationIn(context) > 1) {
+      while (current.alterationIn(context) > 1) {
+        current.w--;
         current.h++;
       }
-      current.h = floor;
-      current.w++;
+      current.h++;
     }
+    let end = new _Pitch(to.w, to.h);
+    while (end.alterationIn(context) > 1) {
+      end.w--;
+      end.h++;
+    }
+    if (end.alterationIn(context) < -1) {
+      while (end.alterationIn(context) < -1) {
+        end.w++;
+        end.h--;
+      }
+      end.h--;
+    }
+    yield new _Pitch(current.w, current.h);
+    i;
+    while (!current.isEqual(end)) {
+      if (current.alterationIn(context) == -1) {
+        current.w += 1;
+        current.h -= 2;
+      } else {
+        current.h++;
+      }
+      yield new _Pitch(current.w, current.h);
+    }
+    return;
   }
 };
 var Pitch = _Pitch;
@@ -1017,24 +1028,6 @@ var _TonalContext = class _TonalContext {
       result.h--;
     }
     return result;
-  }
-  nearestMiBelow(p) {
-    const chroma = p.chroma;
-    const hardMi = 6 - this.chromaOffset;
-    const naturalMi = hardMi - 1;
-    const distanceToHardMi = ((chroma - hardMi) * 3 % 7 - 7) % 7;
-    const distanceToNaturalMi = ((chroma - naturalMi) * 3 % 7 - 7) % 7;
-    let nearestMi = Math.max(distanceToHardMi, distanceToNaturalMi);
-    return p.transposeDiatonic(nearestMi, this);
-  }
-  nextMiAbove(p) {
-    const chroma = p.chroma;
-    const hardMi = 6 - this.chromaOffset;
-    const naturalMi = hardMi - 1;
-    const distanceToHardMi = ((chroma - hardMi) * 3 % 7 + 7) % 7;
-    const distanceToNaturalMi = ((chroma - naturalMi) * 3 % 7 + 7) % 7;
-    let nextMi = Math.max(distanceToHardMi, distanceToNaturalMi);
-    return p.transposeDiatonic(nextMi, this);
   }
 };
 _TonalContext.ACCIDENTAL_MAP = {

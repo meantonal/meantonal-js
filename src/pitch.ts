@@ -204,36 +204,53 @@ export class Pitch {
          *  in the passed-in context will be included.
          */
         *chromatic(from: Pitch, to: Pitch, context: TonalContext) {
-            let current = new Pitch(from.w, from.h);
-            let miBelow = context.nearestMiBelow(current)
-            let floor = miBelow.h;
-            let middle = context.nextMiAbove(miBelow);
-            const end = to;
-            while (middle.stepsTo(end) > 0) {
-                while (current.w <= middle.w - 1) {
-                    while (current.h <= middle.h + 1) {
-                        if (current.stepsTo(from) > 0) {
-                            current.h++;
-                            continue;
-                        }
-                        yield new Pitch(current.w, current.h);
-                        current.h++;
-                    }
-                    current.h = floor;
-                    current.w++;
-                }
-                floor = middle.h;
-                middle = context.nextMiAbove(middle);
+            if (from.intervalTo(to).stepspan < 0) {
+                let swap = from;
+                from = to;
+                to = swap;
             }
-            while (current.w <= end.w) {
-                while (current.h <= middle.h + 1) {
-                    if (current.stepsTo(end) < 0) return;
-                    yield new Pitch(current.w, current.h);
+            
+            // If the lower boundary is outside the chromatic space of the key, adjust as needed.
+            let current = new Pitch(from.w, from.h);
+            while (current.alterationIn(context) < -1) {
+                current.w++;
+                current.h--;
+            }
+            if (current.alterationIn(context) > 1) {
+                while (current.alterationIn(context) > 1) {
+                    current.w--;
                     current.h++;
                 }
-                current.h = floor;
-                current.w++;
+                current.h++;
             }
+
+            // If the upper boundary is outside the chromatic space of the key, adjust as needed.
+            let end = new Pitch(to.w, to.h);
+            while (end.alterationIn(context) > 1) {
+                end.w--;
+                end.h++;
+            }
+            if (end.alterationIn(context) < -1) {
+                while (end.alterationIn(context) < -1) {
+                    end.w++;
+                    end.h--;
+                }
+                end.h--;
+            }
+
+            yield new Pitch(current.w, current.h);
+i
+            while (!current.isEqual(end)) {
+                if (current.alterationIn(context) == -1) {
+                    current.w += 1;
+                    current.h -= 2;
+                } else {
+                    current.h++;
+                }
+                yield new Pitch(current.w, current.h);
+            }
+
+            return;
         },
     }
 
